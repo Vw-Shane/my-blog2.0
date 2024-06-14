@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Blog</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body class="bg-dark text-white">
+  <div class="container mt-5">
+    <h1 class="text-center">My Blog</h1>
+    <div class="list-group mt-4">
+      <% posts.forEach((post, index) => { %>
+        <a href="/post/<%= index %>" class="list-group-item list-group-item-action bg-secondary text-white">
+          <h5><%= post.title %></h5>
+          <small><%= post.date.toDateString() %></small>
+        </a>
+      <% }) %>
+    </div>
+  </div>
+</body>
+</html>
