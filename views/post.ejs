@@ -4,16 +4,24 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><%= post.title %> - My Blog</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="/style.css">
 </head>
-<body>
-  <div class="container">
-    <h1><%= post.title %></h1>
-    <p><%= post.content %></p>
-    <% if (post.image) { %>
-      <img src="<%= post.image %>" alt="Post Image">
-    <% } %>
-    <p><a href="/">Back to home</a></p>
+<body class="bg-dark text-white">
+  <div class="container mt-5">
+    <h1 class="text-center"><%= post.title %></h1>
+    <p class="text-center"><small>Posted on <%= new Date(post.date).toLocaleDateString() %></small></p>
+    <div class="mt-4">
+      <% if (post.image) { %>
+        <div class="text-center mb-4">
+          <img src="<%= post.image %>" alt="<%= post.title %>" class="img-fluid">
+        </div>
+      <% } %>
+      <p><%= post.content %></p>
+    </div>
+    <div class="text-center mt-4">
+      <a href="/" class="btn btn-primary">Back to Home</a>
+    </div>
   </div>
 </body>
 </html>

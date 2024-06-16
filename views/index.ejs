@@ -4,22 +4,26 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My Blog</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="/style.css">
 </head>
-<body>
-  <div class="container">
-    <h1>Recent Posts</h1>
-    <% if (posts.length > 0) { %>
-      <ul>
-        <% posts.forEach((post, index) => { %>
-          <li>
-            <a href="/post/<%= index %>"><%= post.title %></a> - <%= post.date.toDateString() %>
-          </li>
-        <% }); %>
-      </ul>
-    <% } else { %>
-      <p>No posts yet!</p>
-    <% } %>
+<body class="bg-dark text-white">
+  <div class="container mt-5">
+    <h1 class="text-center">Recent Posts</h1>
+    <div class="mt-4">
+      <% if (posts.length === 0) { %>
+        <p class="text-center">No posts available</p>
+      <% } else { %>
+        <div class="list-group">
+          <% posts.forEach((post, index) => { %>
+            <a href="/post/<%= index %>" class="list-group-item list-group-item-action bg-secondary text-white">
+              <h5 class="mb-1"><%= post.title %></h5>
+              <small>Posted on <%= new Date(post.date).toLocaleDateString() %></small>
+            </a>
+          <% }) %>
+        </div>
+      <% } %>
+    </div>
   </div>
 </body>
 </html>
