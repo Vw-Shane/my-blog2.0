@@ -16,15 +16,15 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-// Configure multer-storage-cloudinary
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: 'blog_images',
-    format: async (req, file) => 'png', // Supports promises as well
+    format: async (req, file) => 'png',
     public_id: (req, file) => file.originalname,
   },
 });
+
 const upload = multer({ storage });
 
 // Set up session middleware
@@ -38,7 +38,7 @@ app.use(session({
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Set up static file serving
-app.use('/public', express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Set up EJS as the templating engine
 app.set('view engine', 'ejs');
@@ -64,9 +64,14 @@ app.get('/admin', (req, res) => {
 });
 
 app.post('/admin', upload.single('image'), (req, res) => {
+  console.log('Form data received:', req.body); // Check if form data is received
+  console.log('File data received:', req.file); // Check if file data is received
+
   const { title, content } = req.body;
   const image = req.file ? req.file.path : null;
+
   posts.push({ title, content, date: new Date(), image });
+
   res.redirect('/');
 });
 

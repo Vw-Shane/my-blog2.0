@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin - My Blog</title>
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="/public/styles.css">
+  <link rel="stylesheet" href="/style.css">
 </head>
 <body class="bg-dark text-white">
   <div class="container mt-5">
@@ -26,5 +26,10 @@
       <button type="submit" class="btn btn-primary">Create Post</button>
     </form>
   </div>
+  <script>
+    document.getElementById('image').addEventListener('change', function() {
+      console.log('File input clicked');
+    });
+  </script>
 </body>
 </html>
