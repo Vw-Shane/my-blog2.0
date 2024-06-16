@@ -1,11 +1,4 @@
-{
-  "name": "my-blog",
-  "version": "1.0.0",
-  "description": "A simple blog application",
-  "main": "app.js",
-  "scripts": {
-    "start": "node app.js"
-  },
+
   "dependencies": {
     "express": "^4.17.1",
     "express-session": "^1.17.1",
@@ -15,9 +8,4 @@
     "multer-storage-cloudinary": "^4.0.0",
     "dotenv": "^10.0.0",
     "ejs": "^3.1.6"
-  },
-  "engines": {
-    "node": "14.x",
-    "npm": "6.x"
   }
-}
