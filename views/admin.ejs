@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -22,7 +22,16 @@
       <div class="form-group">
         <label for="image">Image</label>
         <input type="file" class="form-control-file" id="image" name="image">
-        <small id="fileHelp" class="form-text text-muted">Max file size 10MB.</small>
+        <small id="fileHelp" class="form-text text-muted">Max file size 1MB.</small>
+      </div>
+      <div class="form-group">
+        <label for="layout">Image Layout</label>
+        <select class="form-control" id="layout" name="layout" required>
+          <option value="top">Image on top</option>
+          <option value="bottom">Image on bottom</option>
+          <option value="left">Image on left</option>
+          <option value="right">Image on right</option>
+        </select>
       </div>
       <button type="submit" class="btn btn-primary">Create Post</button>
     </form>
@@ -34,11 +43,67 @@
       const errorMessage = document.getElementById('errorMessage');
       errorMessage.textContent = '';
 
-      if (fileInput.files[0] && fileInput.files[0].size > 10 * 1024 * 1024) { // 10MB limit
+      if (fileInput.files[0] && fileInput.files[0].size > 1 * 1024 * 1024) { // 1MB limit
         event.preventDefault();
-        errorMessage.textContent = 'File size exceeds the maximum limit of 10MB.';
+        errorMessage.textContent = 'File size exceeds the maximum limit of 1MB.';
       }
     });
   </script>
+</body>
+</html>
+ -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Create Post</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body class="bg-dark text-white">
+  <div class="container mt-5">
+    <h1 class="text-center">Create New Post</h1>
+    <form action="/admin" method="POST" enctype="multipart/form-data">
+      <div class="form-group">
+        <label for="title">Title</label>
+        <input type="text" class="form-control" id="title" name="title" required>
+      </div>
+      <div class="form-group">
+        <label for="content">Content</label>
+        <textarea class="form-control" id="content" name="content" rows="5" required></textarea>
+      </div>
+      <div class="form-group">
+        <label for="layout">Layout</label>
+        <select class="form-control" id="layout" name="layout">
+          <option value="top">Image Top</option>
+          <option value="bottom">Image Bottom</option>
+          <option value="left">Image Left</option>
+          <option value="right">Image Right</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="size">Image Size</label>
+        <select class="form-control" id="size" name="size">
+          <option value="small">Small</option>
+          <option value="medium">Medium</option>
+          <option value="large">Large</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="qtyPerRow">Images Per Row</label>
+        <select class="form-control" id="qtyPerRow" name="qtyPerRow">
+          <option value="1">1 per row</option>
+          <option value="2">2 per row</option>
+          <option value="3">3 per row</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="images">Images</label>
+        <input type="file" class="form-control-file" id="images" name="images" multiple>
+      </div>
+      <button type="submit" class="btn btn-primary">Create Post</button>
+    </form>
+  </div>
 </body>
 </html>

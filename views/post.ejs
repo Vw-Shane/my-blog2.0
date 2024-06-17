@@ -1,3 +1,74 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= post.title %> - My Blog</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    .post-image-top img {
+      display: block;
+      margin: 0 auto 20px;
+    }
+    .post-image-bottom img {
+      display: block;
+      margin: 20px auto 0;
+    }
+    .post-image-left {
+      display: flex;
+    }
+    .post-image-left img {
+      margin-right: 20px;
+    }
+    .post-image-right {
+      display: flex;
+      flex-direction: row-reverse;
+    }
+    .post-image-right img {
+      margin-left: 20px;
+    }
+  </style>
+</head>
+<body class="bg-dark text-white">
+  <div class="container mt-5">
+    <div class="post">
+      <h2 class="text-center"><%= post.title %></h2>
+      <p class="text-center"><%= post.date.toDateString() %></p>
+      <% if (post.layout === 'top') { %>
+        <div class="post-image-top">
+          <% if (post.image) { %>
+            <img src="<%= post.image %>" class="img-fluid" alt="Post Image">
+          <% } %>
+          <p><%= post.content %></p>
+        </div>
+      <% } else if (post.layout === 'bottom') { %>
+        <div class="post-image-bottom">
+          <p><%= post.content %></p>
+          <% if (post.image) { %>
+            <img src="<%= post.image %>" class="img-fluid" alt="Post Image">
+          <% } %>
+        </div>
+      <% } else if (post.layout === 'left') { %>
+        <div class="post-image-left">
+          <% if (post.image) { %>
+            <img src="<%= post.image %>" class="img-fluid" alt="Post Image">
+          <% } %>
+          <p><%= post.content %></p>
+        </div>
+      <% } else if (post.layout === 'right') { %>
+        <div class="post-image-right">
+          <% if (post.image) { %>
+            <img src="<%= post.image %>" class="img-fluid" alt="Post Image">
+          <% } %>
+          <p><%= post.content %></p>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</body>
+</html>
+ -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,22 +76,81 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><%= post.title %> - My Blog</title>
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    .post-image-top img {
+      display: block;
+      margin: 0 auto 20px;
+      max-width: 100%;
+    }
+    .post-image-bottom img {
+      display: block;
+      margin: 20px auto 0;
+      max-width: 100%;
+    }
+    .post-image-left {
+      display: flex;
+      flex-wrap: wrap;
+    }
+    .post-image-left img {
+      margin-right: 20px;
+      max-width: 100%;
+      margin-bottom: 20px;
+    }
+    .post-image-right {
+      display: flex;
+      flex-wrap: wrap;
+      flex-direction: row-reverse;
+    }
+    .post-image-right img {
+      margin-left: 20px;
+      max-width: 100%;
+      margin-bottom: 20px;
+    }
+  </style>
 </head>
 <body class="bg-dark text-white">
   <div class="container mt-5">
-    <h1 class="text-center"><%= post.title %></h1>
-    <p class="text-center"><small>Posted on <%= new Date(post.date).toLocaleDateString() %></small></p>
-    <div class="mt-4">
-      <% if (post.image) { %>
-        <div class="text-center mb-4">
-          <img src="<%= post.image %>" alt="<%= post.title %>" class="img-fluid">
+    <div class="post">
+      <h2 class="text-center"><%= post.title %></h2>
+      <p class="text-center"><%= post.date.toDateString() %></p>
+      <% if (post.layout === 'top') { %>
+        <div class="post-image-top">
+          <% post.images.forEach((image, index) => { %>
+            <img src="<%= image %>" class="img-fluid" alt="Post Image">
+          <% }); %>
+          <p><%= post.content %></p>
+        </div>
+      <% } else if (post.layout === 'bottom') { %>
+        <div class="post-image-bottom">
+          <p><%= post.content %></p>
+          <% post.images.forEach((image, index) => { %>
+            <img src="<%= image %>" class="img-fluid" alt="Post Image">
+          <% }); %>
+        </div>
+      <% } else if (post.layout === 'left') { %>
+        <div class="post-image-left">
+          <% post.images.forEach((image, index) => { %>
+            <div class="col-md-<%= post.size %> mb-4">
+              <img src="<%= image %>" class="img-fluid" alt="Post Image">
+            </div>
+          <% }); %>
+          <div class="col-md-<%= post.size %> mb-4">
+            <p><%= post.content %></p>
+          </div>
+        </div>
+      <% } else if (post.layout === 'right') { %>
+        <div class="post-image-right">
+          <div class="col-md-<%= post.size %> mb-4">
+            <p><%= post.content %></p>
+          </div>
+          <% post.images.forEach((image, index) => { %>
+            <div class="col-md-<%= post.size %> mb-4">
+              <img src="<%= image %>" class="img-fluid" alt="Post Image">
+            </div>
+          <% }); %>
         </div>
       <% } %>
-      <p><%= post.content %></p>
-    </div>
-    <div class="text-center mt-4">
-      <a href="/" class="btn btn-primary">Back to Home</a>
     </div>
   </div>
 </body>
