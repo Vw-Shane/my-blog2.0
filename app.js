@@ -74,6 +74,8 @@ const path = require('path');
 const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const { v4: uuidv4 } = require('uuid'); // Add this line to import UUID package
+
 require('dotenv').config();
 
 cloudinary.config({
@@ -113,8 +115,8 @@ app.get('/', (req, res) => {
   res.render('index', { posts });
 });
 
-app.get('/post/:id', (req, res) => {
-  const post = posts[req.params.id];
+app.get('/post/:category/:id', (req, res) => {
+  const post = posts.find(p => p.id === req.params.id);
   res.render('post', { post });
 });
 
@@ -122,17 +124,39 @@ app.get('/admin', (req, res) => {
   res.render('admin');
 });
 
+// app.post('/admin', upload.array('images', 10), async (req, res) => {
+//   console.log('Form data received:', req.body); // Check if form data is received
+//   console.log('File data received:', req.files); // Check if file data is received
+//   const { title, content, category, layout, size, qtyPerRow } = req.body;
+//   const images = req.files ? req.files.map(file => file.path) : [];
+
+//   posts.push({ title, content, category, date: new Date(), images, layout, size, qtyPerRow });
+
+//   res.redirect('/');
+// });
+//app.post('/admin', upload.single('image'), async (req, res) => {
 app.post('/admin', upload.array('images', 10), async (req, res) => {
   console.log('Form data received:', req.body); // Check if form data is received
   console.log('File data received:', req.files); // Check if file data is received
   const { title, content, category, layout, size, qtyPerRow } = req.body;
   const images = req.files ? req.files.map(file => file.path) : [];
 
-  posts.push({ title, content, category, date: new Date(), images, layout, size, qtyPerRow });
+  const newPost = {
+    id: uuidv4(), // Generate a unique ID for the post
+    title,
+    content,
+    category,
+    date: new Date(),
+    images,
+    layout,
+    size,
+    qtyPerRow
+  };
+
+  posts.push(newPost);
 
   res.redirect('/');
 });
-
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
