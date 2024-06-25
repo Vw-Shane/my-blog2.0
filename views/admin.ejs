@@ -78,9 +78,11 @@
             <div class="form-group">
                 <label for="category">Category</label>
                 <select class="form-control" id="category" name="category" required>
-                    <option value="Legos">Legos</option>
-                    <option value="Just Photos">Just Photos</option>
-                    <option value="Other">Other</option>
+                    <% categories.forEach(category => { %>
+                    <option value="<%= category %>">
+                        <%= category %>
+                    </option>
+                    <% }); %>
                 </select>
             </div>
             <div class="form-group">
@@ -88,7 +90,7 @@
                 <select class="form-control" id="layout" name="layout">
                     <option value="top">Image Top</option>
                     <option value="bottom">Image Bottom</option>
-                   <!--  <option value="left">Image Left</option>
+                    <!--  <option value="left">Image Left</option>
                     <option value="right">Image Right</option> -->
                 </select>
             </div>

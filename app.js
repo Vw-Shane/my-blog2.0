@@ -77,6 +77,7 @@ const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const { v4: uuidv4 } = require('uuid'); // Add this line to import UUID package
 
 require('dotenv').config();
+const adminPassword2 = process.env.ADMIN_PASSWORD2;
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -110,9 +111,17 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 const posts = [];
+const categories = ['Legos', 'Just Photos', 'Automotive']; // Define your categories here
+// Middleware to check if user is authenticated
+function isAuthenticated(req, res, next) {
+  if (req.session.authenticated) {
+    return next();
+  }
+  res.redirect('/login');
+}
 
 app.get('/', (req, res) => {
-  res.render('index', { posts });
+  res.render('index', { posts, categories });
 });
 
 app.get('/post/:category/:id', (req, res) => {
@@ -120,10 +129,23 @@ app.get('/post/:category/:id', (req, res) => {
   res.render('post', { post });
 });
 
-app.get('/admin', (req, res) => {
-  res.render('admin');
+app.get('/admin', isAuthenticated, (req, res) => {
+  res.render('admin', { categories }); // Pass categories to the admin view
 });
 
+app.get('/login', (req, res) => {
+  res.render('login', { error: null });
+});
+
+app.post('/login', (req, res) => {
+  const { password } = req.body;
+  if (password === adminPassword2) {
+    req.session.authenticated = true;
+    res.redirect('/admin');
+  } else {
+    res.render('login', { error: 'Incorrect password' });
+  }
+});
 // app.post('/admin', upload.array('images', 10), async (req, res) => {
 //   console.log('Form data received:', req.body); // Check if form data is received
 //   console.log('File data received:', req.files); // Check if file data is received

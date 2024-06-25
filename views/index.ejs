@@ -1,30 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Blog</title>
-  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css">
-  <style>
-    .post-container {
-      cursor: pointer;
-      max-width: 15vw;
-      width: 100%;
-      aspect-ratio: 1/1;
-      margin-bottom: 20px;
-/*      position: relative;
-      overflow: hidden;*/
-    }
 
-    .post {
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Blog</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <style>
+        .post-container {
+        cursor: pointer;
+        max-width: 15vw;
+        width: 100%;
+        aspect-ratio: 1/1;
+        margin-bottom: 20px;
+        /*      position: relative;
+      overflow: hidden;*/
+
         padding: .5vw;
         background: #f8f9fa;
         color: #333;
         margin-bottom: .5vw;
         border-radius: 10px;
     }
-/*
+
+    /*
     .post {
       position: absolute;
       top: 0;
@@ -39,43 +42,86 @@
       padding: 10px;
       box-sizing: border-box;
     }*/
-    .post img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border-radius: 10px;
+    .post-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 10px;
 
 
     }
-  </style>
 
+    .intro {
+        background-color: #455753;
+        max-width: 100%;
+    }
+    </style>
 </head>
-<body class="bg-dark text-white">
-  <div class="container mt-5">
-    <h1 class="text-center">My Blog</h1>
-    <div class="posts mt-4">
-      <% ['Legos', 'Just Photos', 'Other'].forEach(category => { %>
-        <div class="category-section">
-          <h2 class="category-header"><%= category %></h2>
-          <div class="row">
-            <% posts.filter(post => post.category === category).forEach((post) => { %>
-              <div class="col-md-4">
-                <div class="post-container" onclick="window.location.href='/post/<%= post.category %>/<%= post.id %>'">
-                  <div class="post">
-                    <h3><%= post.title %></h3>
-                    <p><%= post.date.toDateString() %></p>
-                    <% if (post.images) { %>
-                      <img src="<%= post.images %>" class="img-fluid" alt="Post Image">
-                    <% } %>
 
-                  </div>
-                </div>
-              </div>
-            <% }); %>
-          </div>
+<body class="bg-dark text-white">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark ">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                </li>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Dropdown
+                    </a>
+                   <% categories.forEach(category => { %>
+                        <option value="<%= category %>"><%= category %></option>
+                    <% }); %>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link disabled" href="#">Disabled</a>
+                </li>
+            </ul>
+            <form class="form-inline my-2 my-lg-0">
+                <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+            </form>
         </div>
-      <% }); %>
+    </nav>
+    <div class="container mt-2 intro">
+        <!-- <h1 class="text-center">My Blog</h1> -->
+        <h4 class="text-center "> Welcome to the blog. <br>Below you'll see recent and pinned posts, as well a link to my merch store.<br>Up above you can go to specific blog categories and see all the posts associated to them.<br>Feel free to subscribe to them all at this link or subscribe to induvial ones from within the above categories.<br> Enjoy! </h4>
     </div>
-  </div>
+    <div class="container mt-5">
+        <div class="posts mt-4">
+            <% categories.forEach(category => { %>
+            <% const categoryPosts = posts.filter(post => post.category === category); %>
+            <% if (categoryPosts.length > 0) { %>
+            <div class="category-section">
+                <h2 class="category-header">
+                    <%= category %>
+                </h2>
+                <div class="row">
+                    <% categoryPosts.forEach((post, index) => { %>
+                    <div class="col-md-4">
+                        <div class="post-container" onclick="window.location.href='/post/<%= post.category %>/<%= post.id %>'">
+                            <h3>
+                                <%= post.title %>
+                            </h3>
+                            <p>
+                                <%= post.date.toDateString() %>
+                            </p>
+                            <% if (post.images && post.images.length > 0) { %>
+                            <img src="<%= post.images[0] %>" class="img-fluid" alt="Post Image">
+                            <% } %>
+                        </div>
+                    </div>
+                    <% }); %>
+                </div>
+            </div>
+            <% } %>
+            <% }); %>
+        </div>
+    </div>
 </body>
+
 </html>
