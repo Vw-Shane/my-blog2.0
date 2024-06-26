@@ -52,47 +52,20 @@
     }
 
     .intro {
-        background-color: #455753;
+/*        background-color: #455753;*/
         max-width: 100%;
     }
     </style>
 </head>
 
 <body class="bg-dark text-white">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark ">
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto">
-                <li class="nav-item active">
-                    <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
-                </li>
-
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Dropdown
-                    </a>
-                   <% categories.forEach(category => { %>
-                        <option value="<%= category %>"><%= category %></option>
-                    <% }); %>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link disabled" href="#">Disabled</a>
-                </li>
-            </ul>
-            <form class="form-inline my-2 my-lg-0">
-                <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-            </form>
-        </div>
-    </nav>
+    <%- include('nav') %>
     <div class="container mt-2 intro">
         <!-- <h1 class="text-center">My Blog</h1> -->
-        <h4 class="text-center "> Welcome to the blog. <br>Below you'll see recent and pinned posts, as well a link to my merch store.<br>Up above you can go to specific blog categories and see all the posts associated to them.<br>Feel free to subscribe to them all at this link or subscribe to induvial ones from within the above categories.<br> Enjoy! </h4>
+        <h4 class="text-center "> Welcome to my blog. <br>Below you'll see recent and pinned posts, as well a link to my merch store.<br>Up above you can go to specific blog categories and see all the posts associated to them.<br>Feel free to subscribe to them all at this link or subscribe to induvial ones from within the above categories.<br> Enjoy! </h4>
     </div>
     <div class="container mt-5">
-        <div class="posts mt-4">
+        <!-- <div class="posts mt-4">
             <% categories.forEach(category => { %>
             <% const categoryPosts = posts.filter(post => post.category === category); %>
             <% if (categoryPosts.length > 0) { %>
@@ -121,6 +94,33 @@
             <% } %>
             <% }); %>
         </div>
+ -->
+
+<div class="posts mt-4">
+    <div class="row">
+        <% categories.forEach(category => { %>
+    <% const categoryPosts = posts.filter(post => post.category === category); %>
+    <% if (categoryPosts.length > 0) { %>
+        <% const recentPost = categoryPosts[categoryPosts.length - 1]; %>
+       
+        <div class="col-md-4">
+             <h2 class="category-header">
+                    <%= category %>
+                </h2>
+            <div class="post-container" onclick="window.location.href='/post/<%= recentPost.category %>/<%= recentPost.id %>'">
+                <h3><%= recentPost.title %></h3>
+                <p><%= recentPost.date.toDateString() %></p>
+                <% if (recentPost.images && recentPost.images.length > 0) { %>
+                <img src="<%= recentPost.images[0] %>" class="img-fluid" alt="Post Image">
+                <% } %>
+            </div>
+        </div>
+        <% } %>
+        <% }); %>
+    </div>
+</div>
+
+
     </div>
 </body>
 

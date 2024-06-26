@@ -126,7 +126,7 @@ app.get('/', (req, res) => {
 
 app.get('/post/:category/:id', (req, res) => {
   const post = posts.find(p => p.id === req.params.id);
-  res.render('post', { post });
+  res.render('post', { post,categories });
 });
 
 app.get('/admin', isAuthenticated, (req, res) => {
