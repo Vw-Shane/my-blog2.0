@@ -153,10 +153,7 @@ function isAuthenticated(req, res, next) {
 // });
 app.get('/', async (req, res) => {
   try {
-    const query = 'SELECT categoryName FROM blog2.categories'; // Adjust schema name if necessary
-    const result = await client.query(query);
-    const categories = result.rows; // Assuming result.rows contains the fetched categories
- console.log(categories); // Log categories to the console
+    
 
     res.render('index', { posts, categories });
   } catch (err) {
