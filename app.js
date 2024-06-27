@@ -130,6 +130,23 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 const posts = [];
+// Define middleware to fetch categories
+const fetchCategoriesMiddleware = async (req, res, next) => {
+  try {
+    const query = 'SELECT categoryName FROM blog2.categories'; // Adjust schema name if necessary
+    const result = await client.query(query);
+    const categories = result.rows.map(row => row.categoryname); // Extract category names
+  
+    res.locals.categories = categories; // Make categories available in res.locals
+  
+    next(); // Proceed to next middleware or route handler
+  } catch (err) {
+    console.error('Error fetching categories', err);
+    res.locals.categories = []; // Set categories to empty array or handle error
+    next(); // Proceed to next middleware or route handler
+  }
+};
+app.use(fetchCategoriesMiddleware);
 // const categories = ['Legos', 'Just Photos', 'Automotive']; // Define your categories here
 // Middleware to check if user is authenticated
 function isAuthenticated(req, res, next) {
@@ -155,7 +172,7 @@ app.get('/', async (req, res) => {
   try {
     
 
-    res.render('index', { posts, categories });
+    res.render('index', { posts, categories: res.locals.categories });
   } catch (err) {
     console.error('Error executing query', err);
     res.status(500).json({ error: 'Database error' });
@@ -165,16 +182,12 @@ app.get('/', async (req, res) => {
 
 app.get('/post/:category/:id', (req, res) => {
   const post = posts.find(p => p.id === req.params.id);
-  res.render('post', { post,categories });
+  res.render('post', { post,categories: res.locals.categories });
 });
 
 app.get('/admin', isAuthenticated, async(req, res) => {
-      const query = 'SELECT categoryName FROM blog2.categories'; // Adjust schema name if necessary
-    const result = await client.query(query);
-    const categories = result.rows.map(row => row.categoryname); // Extract category names
-
-   
-  res.render('admin', { categories }); // Pass categories to the admin view
+res.render('admin', { categories: res.locals.categories });
+ // res.render('admin', { categories }); // Pass categories to the admin view
 });
 
 app.get('/login', (req, res) => {
