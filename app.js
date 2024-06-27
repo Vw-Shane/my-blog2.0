@@ -75,9 +75,21 @@ const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const { v4: uuidv4 } = require('uuid'); // Add this line to import UUID package
-
+const { Client } = require('pg');
 require('dotenv').config();
 const adminPassword2 = process.env.ADMIN_PASSWORD2;
+const client = new Client({
+  host: process.env.DATABASE_HOST,
+  port: process.env.DATABASE_PORT,
+  database: process.env.DATABASE_NAME,
+  user: process.env.DATABASE_USER,
+  password: process.env.DATABASE_PASSWORD,
+  //   ssl: {
+  //   rejectUnauthorized: false,
+  // }
+});
+
+
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -93,6 +105,13 @@ const storage = new CloudinaryStorage({
     public_id: (req, file) => file.originalname,
     transformation: [{ width: 400, height: 400, crop: 'limit' }]
   },
+});
+client.connect(err => {
+  if (err) {
+    console.error('Connection error', err.stack);
+  } else {
+    console.log('Connected to the database');
+  }
 });
 
 const upload = multer({ storage });
@@ -111,7 +130,7 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 const posts = [];
-const categories = ['Legos', 'Just Photos', 'Automotive']; // Define your categories here
+// const categories = ['Legos', 'Just Photos', 'Automotive']; // Define your categories here
 // Middleware to check if user is authenticated
 function isAuthenticated(req, res, next) {
   if (req.session.authenticated) {
@@ -120,16 +139,44 @@ function isAuthenticated(req, res, next) {
   res.redirect('/login');
 }
 
-app.get('/', (req, res) => {
-  res.render('index', { posts, categories });
+// app.get('/', async (req, res) => {
+//   try {
+//     const query = 'SELECT * FROM categories'; // Adjust SQL query as per your table structure
+//     const result = await client.query(query);
+//     const categories = result.rows; // Assuming result.rows contains the fetched categories
+
+//     res.render('index', { posts, categories });
+//   } catch (err) {
+//     console.error('Error executing query', err);
+//     res.status(500).json({ error: 'Database error' });
+//   }
+// });
+app.get('/', async (req, res) => {
+  try {
+    const query = 'SELECT categoryName FROM blog2.categories'; // Adjust schema name if necessary
+    const result = await client.query(query);
+    const categories = result.rows; // Assuming result.rows contains the fetched categories
+ console.log(categories); // Log categories to the console
+
+    res.render('index', { posts, categories });
+  } catch (err) {
+    console.error('Error executing query', err);
+    res.status(500).json({ error: 'Database error' });
+  }
 });
+
 
 app.get('/post/:category/:id', (req, res) => {
   const post = posts.find(p => p.id === req.params.id);
   res.render('post', { post,categories });
 });
 
-app.get('/admin', isAuthenticated, (req, res) => {
+app.get('/admin', isAuthenticated, async(req, res) => {
+      const query = 'SELECT categoryName FROM blog2.categories'; // Adjust schema name if necessary
+    const result = await client.query(query);
+    const categories = result.rows.map(row => row.categoryname); // Extract category names
+
+   
   res.render('admin', { categories }); // Pass categories to the admin view
 });
 
@@ -146,6 +193,9 @@ app.post('/login', (req, res) => {
     res.render('login', { error: 'Incorrect password' });
   }
 });
+
+
+
 // app.post('/admin', upload.array('images', 10), async (req, res) => {
 //   console.log('Form data received:', req.body); // Check if form data is received
 //   console.log('File data received:', req.files); // Check if file data is received
