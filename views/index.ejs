@@ -46,24 +46,26 @@
     </div>
     <div class="container mt-5">
         <div class="posts mt-4">
+ <div class="posts mt-4">
             <div class="row">
                 <% categories.forEach(category => { %>
-                <% const recentPost = posts[category.id]; %>
-                <% if (recentPost) { %>
+                <% const recentEntry = entries[category.id]; %>
+                <% if (recentEntry) { %>
                 <div class="col-md-4">
                     <h2 class="category-header"><%= category.categoryname %></h2>
-                    <div class="post-container" onclick="window.location.href='/post/<%= recentPost.category_id %>/<%= recentPost.post_id %>'">
-                        <h3><%= recentPost.title %></h3>
-                        <p><%= new Date(recentPost.createdate).toLocaleDateString() %></p>
+                    <div class="post-container" onclick="window.location.href='/post/<%= recentEntry.category_id %>/<%= recentEntry.post_id || recentEntry.project_id %>'">
+                        <h3><%= recentEntry.title %></h3>
+                        <p><%= new Date(recentEntry.createdate).toLocaleDateString() %></p>
 
-                        <% if (recentPost.photo_link) { %>
-                        <img src="<%= recentPost.photo_link %>" class="img-fluid" alt="Post Image">
+                        <% if (recentEntry.photo_link) { %>
+                        <img src="<%= recentEntry.photo_link %>" class="img-fluid" alt="Post Image">
                         <% } %>
                     </div>
                 </div>
                 <% } %>
                 <% }); %>
             </div>
+        </div>
         </div>
     </div>
 </body>
