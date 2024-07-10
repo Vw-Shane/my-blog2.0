@@ -294,10 +294,19 @@ app.get('/', async (req, res) => {
       const categoryPosts = posts.filter(post => post.category_id === category.id);
       const categoryProjects = projects.filter(project => project.category_id === category.id);
 
-      // Combine posts and projects, then sort by createDate to find the most recent
-      const combinedEntries = [...categoryPosts, ...categoryProjects].sort((a, b) => new Date(b.createdate) - new Date(a.createdate));
-      if (combinedEntries.length > 0) {
-        recentEntries[category.id] = combinedEntries[0]; // Most recent entry
+     // Combine posts and projects
+      const combinedEntries = [
+        ...categoryPosts.map(post => ({ ...post, type: 'post' })),
+        ...categoryProjects.map(project => ({ ...project, type: 'project' }))
+      ];
+
+      // Find the most recent entry where testTF is false or if we're on localhost
+      const recentEntry = combinedEntries.find(entry => {
+        return isLocalhost || (!entry.testtf || entry.testtf === 'f');
+      });
+
+      if (recentEntry) {
+        recentEntries[category.id] = recentEntry; // Most recent entry
       }
     });
 
