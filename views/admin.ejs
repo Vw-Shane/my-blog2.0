@@ -83,6 +83,7 @@
     <div class="container mt-5">
         <h1 class="text-center">Create New Post/Project</h1>
         <form id="creationForm" action="/admin" method="POST" enctype="multipart/form-data">
+            
             <div class="form-group">
                 <label for="type">Type</label>
                 <select class="form-control" id="type" name="type" required>
@@ -109,39 +110,57 @@
                 <textarea class="form-control" id="content" name="content" rows="5" required></textarea>
             </div>
             <div class="form-group">
-    <label for="category">Category</label>
-    <select class="form-control" id="category" name="category" required>
-        <% categories.forEach(category => { %>
-        <option value="<%= category.id %>"><%= category.categoryname %></option>
-        <% }); %>
-    </select>
-</div>
-<div class="form-group">
-    <label for="layout">Layout</label>
-    <select class="form-control" id="layout" name="layout" required>
-        <% layoutOptions.forEach(layout => { %>
-        <option value="<%= layout.placement_id %>"><%= layout.value %></option>
-        <% }); %>
-    </select>
-</div>
-<div class="form-group">
-    <label for="size">Image Size</label>
-    <select class="form-control" id="size" name="size" required>
-        <% sizeOptions.forEach(size => { %>
-        <option value="<%= size.size_id %>"><%= size.value %></option>
-        <% }); %>
-    </select>
-</div>
-
+                <label for="category">Category</label>
+                <select class="form-control" id="category" name="category" required>
+                    <% categories.forEach(category => { %>
+                    <option value="<%= category.id %>">
+                        <%= category.categoryname %>
+                    </option>
+                    <% }); %>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="layout">Layout</label>
+                <select class="form-control" id="layout" name="layout" required>
+                    <% layoutOptions.forEach(layout => { %>
+                    <option value="<%= layout.placement_id %>">
+                        <%= layout.value %>
+                    </option>
+                    <% }); %>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="size">Image Size</label>
+                <select class="form-control" id="size" name="size" required>
+                    <% sizeOptions.forEach(size => { %>
+                    <option value="<%= size.size_id %>">
+                        <%= size.value %>
+                    </option>
+                    <% }); %>
+                </select>
+            </div>
             <div class="form-group">
                 <label for="images">Images</label>
                 <input type="file" class="form-control-file" id="images" name="images" multiple>
             </div>
+             <div class="form-group">
+                <input type="checkbox" id="testtf" name="testtf" value="true">
+                <label for="testtf">Test T/F</label>
+            </div>
             <div id="sectionsContainer"></div>
             <button type="submit" class="btn btn-primary">Create</button>
+
         </form>
     </div>
     <script>
+    // document.getElementById('myForm').addEventListener('change', function() {
+    //     // Get the checkbox element
+    //     const checkbox = document.getElementById('testtf');
+
+    //     // Determine if the checkbox is checked
+    //     const isChecked = checkbox.checked;
+    // });
+
     document.getElementById('type').addEventListener('change', function() {
         const type = this.value;
         const sectionQtyDiv = document.getElementById('sectionQtyDiv');

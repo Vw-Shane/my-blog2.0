@@ -268,6 +268,7 @@ function isAuthenticated(req, res, next) {
 
 app.get('/', async (req, res) => {
   try {
+    const isLocalhost = req.get('host') === 'localhost:3000';    
     const categoriesResult = await client.query('SELECT * FROM blog2.categories ORDER BY id');
     const categories = categoriesResult.rows;
 
@@ -284,7 +285,11 @@ app.get('/', async (req, res) => {
     categories.forEach(category => {
       const categoryPosts = posts.filter(post => post.category_id === category.id);
       if (categoryPosts.length > 0) {
-        recentPosts[category.id] = categoryPosts[0]; // Most recent post
+        // Only include the post if testtf is false or if we're on localhost
+        const recentPost = categoryPosts.find(post => isLocalhost || !post.testtf);
+        if (recentPost) {
+          recentPosts[category.id] = recentPost;
+        }
       }
     });
 
@@ -384,11 +389,12 @@ app.post('/login', (req, res) => {
 // });
 app.post('/admin', upload.array('images', 10), async (req, res) => {
   try {
-    const { title, content, category, layout, size } = req.body;
+    const { title, content, category, layout, size, testTF } = req.body;
+    const testtf = req.body.testtf === 'true' ? true : false; // Default to false
     const images = req.files ? req.files.map(file => file.path) : [];
 
     // Log form values for debugging
-    console.log('Form Values:', { title, content, category, layout, size });
+    console.log('Form Values:', { title, content, category, layout, size, testTF });
 
     // Ensure all required fields are present
     if (!title || !content || !category || !layout || !size) {
@@ -396,11 +402,11 @@ app.post('/admin', upload.array('images', 10), async (req, res) => {
     }
 
     const query = `
-      INSERT INTO blog2.post (category_id, title, content, photolocation_id, photosize_id, photo_link, viewcount, createdate, modifieddate, adspace_id)
-      VALUES ($1, $2, $3, $4, $5, $6, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NULL)
+      INSERT INTO blog2.post (category_id, title, content, photolocation_id, photosize_id, photo_link, viewcount, createdate, modifieddate, adspace_id, testtf)
+      VALUES ($1, $2, $3, $4, $5, $6, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NULL,$7)
       RETURNING *
     `;
-    const values = [category, title, content, layout, size, images[0]];
+    const values = [category, title, content, layout, size, images[0], testTF];
     const result = await client.query(query, values);
 
     // Log the result for debugging
