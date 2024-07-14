@@ -272,88 +272,156 @@ app.get('/', async (req, res) => {
         const categoriesResult = await client.query('SELECT * FROM blog2.categories ORDER BY id');
         const categories = categoriesResult.rows;
 
-        const postsResult = await client.query(`
-      SELECT p.*, c.categoryname AS category_name
-      FROM blog2.post p
-      JOIN blog2.categories c ON p.category_id = c.id
-      ORDER BY p.createDate DESC
-    `);
-        const posts = postsResult.rows;
+        const ppResult = await client.query(`
+            SELECT pp.*,
+              coalesce(pjt.title,pst.title) as title,
+              coalesce(pjt.createdate,pst.createdate) as createdate, 
+              c.categoryname AS category_name
+            FROM pp 
+            JOIN blog2.categories c ON pp.category_id = c.id
+            left join blog2.post pst on pp.post_id=pst.post_id and c.id=pst.category_id
+            left join blog2.project pjt on pp.project_id=pjt.project_id and c.id=pjt.category_id
+            ORDER BY pp.pp_id DESC
+        `);
+        const ppEntries = ppResult.rows;
 
-        const projectsResult = await client.query(`
-      SELECT pr.*, c.categoryname AS category_name
-      FROM blog2.project pr
-      JOIN blog2.categories c ON pr.category_id = c.id
-      ORDER BY pr.createDate DESC
-    `);
-        const projects = projectsResult.rows;
+        const recentEntries = {};
+        categories.forEach(category => {
+            // Filter entries based on the current category
+            const categoryEntries = ppEntries.filter(entry => entry.category_id === category.id);
 
-    // Create a mapping of categories to their most recent entry (post or project)
-    const recentEntries = {};
-    categories.forEach(category => {
-      const categoryPosts = posts.filter(post => post.category_id === category.id);
-      const categoryProjects = projects.filter(project => project.category_id === category.id);
+            // Find the most recent entry considering the localhost condition
+            let recentEntry;
+            if (isLocalhost) {
+                // On localhost, include both localhostTF = 0 and localhostTF = 1
+                recentEntry = categoryEntries[0]; // Assuming entries are ordered by descending pp_id
+            } else {
+                // On non-localhost, only include entries with localhostTF = 0
+                recentEntry = categoryEntries.find(entry => !entry.localhosttf);
+            }
 
-     // Combine posts and projects
-      const combinedEntries = [
-        ...categoryPosts.map(post => ({ ...post, type: 'post' })),
-        ...categoryProjects.map(project => ({ ...project, type: 'project' }))
-      ];
+            // Save the found entry to the result map if it exists
+            if (recentEntry) {
+                recentEntries[category.id] = recentEntry;
+            }
+        });
 
-      // Find the most recent entry where testTF is false or if we're on localhost
-      const recentEntry = combinedEntries.find(entry => {
-        return isLocalhost || (!entry.testtf || entry.testtf === 'f');
-      });
-
-      if (recentEntry) {
-        recentEntries[category.id] = recentEntry; // Most recent entry
-      }
-    });
-
-            res.render('index', { entries: recentEntries, categories });
+        res.render('index', { entries: recentEntries, categories });
     } catch (err) {
         console.error('Error executing query', err);
         res.status(500).json({ error: 'Database error' });
     }
 });
 
+// app.get('/post/:category_id/:id', async (req, res) => {
+//     try {
+//         const { id } = req.params;
 
-app.get('/post/:category_id/:id', async (req, res) => {
+//         // Fetch the pp entry using the provided id
+//         const ppQuery = 'SELECT * FROM pp WHERE pp_id = $1';
+//         const ppValues = [id];
+//         const ppResult = await client.query(ppQuery, ppValues);
+//         const ppEntry = ppResult.rows[0];
+
+//         if (!ppEntry) {
+//             return res.status(404).json({ error: 'Entry not found in pp table' });
+//         }
+
+//         if (ppEntry.post_id) {
+//             // Fetch the post if post_id is present
+//             const postQuery = 'SELECT * FROM blog2.post WHERE post_id = $1';
+//             const postValues = [ppEntry.post_id];
+//             const postResult = await client.query(postQuery, postValues);
+//             const post = postResult.rows[0];
+
+//             if (post) {
+//                 return res.render('post', { post });
+//             }
+//         } else if (ppEntry.project_id) {
+//             // Fetch the project if project_id is present
+//             const projectQuery = 'SELECT * FROM blog2.project WHERE project_id = $1';
+//             const projectValues = [ppEntry.project_id];
+//             const projectResult = await client.query(projectQuery, projectValues);
+//             const project = projectResult.rows[0];
+
+//             if (!project) {
+//                 return res.status(404).json({ error: 'Project not found' });
+//             }
+
+//             // Fetch the project sections
+//             const sectionsQuery = 'SELECT * FROM blog2.projectsection WHERE project_id = $1';
+//             const sectionsValues = [ppEntry.project_id];
+//             const sectionsResult = await client.query(sectionsQuery, sectionsValues);
+//             const sections = sectionsResult.rows;
+
+//             return res.render('project', { project, sections });
+//         } else {
+//             return res.status(404).json({ error: 'No associated post or project found' });
+//         }
+//     } catch (err) {
+//         console.error('Error fetching post or project', err);
+//         res.status(500).json({ error: 'Database error' });
+//     }
+// });
+
+app.get('/post/:category_id/:pp_id', async (req, res) => {
     try {
-        const { id } = req.params;
+        const { category_id, pp_id } = req.params;
 
-        // First, try to fetch the post
-        let query = 'SELECT * FROM blog2.post WHERE post_id = $1';
-        let values = [id];
-        let result = await client.query(query, values);
-        let post = result.rows[0];
+        // Fetch the pp entry using the provided pp_id
+        const ppQuery = 'SELECT * FROM pp WHERE pp_id = $1';
+        const ppValues = [pp_id];
+        const ppResult = await client.query(ppQuery, ppValues);
+        const ppEntry = ppResult.rows[0];
 
-        if (post) {
-            return res.render('post', { post });
+        if (!ppEntry) {
+            return res.status(404).json({ error: 'Entry not found in pp table' });
         }
 
-        // If no post is found, try to fetch the project
-        query = 'SELECT * FROM blog2.project WHERE project_id = $1';
-        result = await client.query(query, values);
-        let project = result.rows[0];
+        // Fetch the post or project based on ppEntry.post_id or ppEntry.project_id
+        let post, project, sections;
 
-        if (!project) {
-            return res.status(404).json({ error: 'Post or Project not found' });
+        if (ppEntry.post_id) {
+            // Fetch the post
+            const postQuery = 'SELECT * FROM blog2.post WHERE post_id = $1';
+            const postValues = [ppEntry.post_id];
+            const postResult = await client.query(postQuery, postValues);
+            post = postResult.rows[0];
+
+            if (!post) {
+                return res.status(404).json({ error: 'Post not found' });
+            }
+
+            // Render the post view
+            return res.render('post', { post, category_id });
+
+        } else if (ppEntry.project_id) {
+            // Fetch the project
+            const projectQuery = 'SELECT * FROM blog2.project WHERE project_id = $1';
+            const projectValues = [ppEntry.project_id];
+            const projectResult = await client.query(projectQuery, projectValues);
+            project = projectResult.rows[0];
+
+            if (!project) {
+                return res.status(404).json({ error: 'Project not found' });
+            }
+
+            // Fetch the project sections
+            const sectionsQuery = 'SELECT * FROM blog2.projectsection WHERE project_id = $1';
+            const sectionsValues = [ppEntry.project_id];
+            const sectionsResult = await client.query(sectionsQuery, sectionsValues);
+            sections = sectionsResult.rows;
+
+            // Render the project view
+            return res.render('project', { project, sections, category_id });
+        } else {
+            return res.status(404).json({ error: 'No associated post or project found' });
         }
-
-        // Fetch the project sections
-        query = 'SELECT * FROM blog2.projectsection WHERE project_id = $1';
-        result = await client.query(query, values);
-        const sections = result.rows;
-
-        res.render('project', { project, sections });
     } catch (err) {
         console.error('Error fetching post or project', err);
         res.status(500).json({ error: 'Database error' });
     }
 });
-
-
 
 app.get('/admin', isAuthenticated, async (req, res) => {
     try {
@@ -373,7 +441,6 @@ app.get('/admin', isAuthenticated, async (req, res) => {
     }
 });
 
-
 app.get('/login', (req, res) => {
     res.render('login', { error: null });
 });
@@ -387,48 +454,13 @@ app.post('/login', (req, res) => {
         res.render('login', { error: 'Incorrect password' });
     }
 });
-
-// app.post('/admin', upload.array('images', 10), async (req, res) => {
-//   try {
-//     const { title, content, category, layout, size } = req.body;
-//     const images = req.files ? req.files.map(file => file.path) : [];
-
-//     // Fetch layout_id and size_id from their respective tables
-//     const layoutQuery = 'SELECT placement_id FROM blog2.photoPlacement WHERE value = $1';
-//     const layoutResult = await client.query(layoutQuery, [layout]);
-//     const layout_id = layoutResult.rows[0]?.placement_id;
-
-//     const sizeQuery = 'SELECT size_id FROM blog2.photoSize WHERE value = $1';
-//     const sizeResult = await client.query(sizeQuery, [size]);
-//     const size_id = sizeResult.rows[0]?.size_id;
-
-//     if (!layout_id || !size_id) {
-//       throw new Error('Invalid layout or size value');
-//     }
-
-//     const query = `
-//       INSERT INTO blog2.post (category_id, title, content, photolocation_id, photosize_id, photo_link, viewcount, createdate, modifieddate, adspace_id)
-//       VALUES ($1, $2, $3, $4, $5, $6, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NULL)
-//       RETURNING *
-//     `;
-//     const values = [category, title, content, layout_id, size_id, images[0]];
-//     await client.query(query, values);
-
-//     res.redirect('/');
-//   } catch (err) {
-//     console.error('Error creating post', err);
-//     res.status(500).json({ error: 'Database error' });
-//   }
-// });
 app.post('/admin', upload.array('images', 10), async (req, res) => {
     try {
         const { type, title, content, category, layout, size, sectionQty, sectionTitles, sectionContents, testtf } = req.body;
-        //const testtf = req.body.testtf === 'true' ? 't' : 'f'; // Default to false
         const images = req.files ? req.files.map(file => file.path) : [];
 
         // Log form values for debugging
         console.log('Form Values:', { type, title, content, category, layout, size, sectionQty, sectionTitles, sectionContents, testtf });
-
 
         // Ensure all required fields are present
         if (!title || !content || !category || !layout || !size) {
@@ -436,35 +468,53 @@ app.post('/admin', upload.array('images', 10), async (req, res) => {
         }
 
         if (type === 'post') {
-            const query = `
-        INSERT INTO blog2.post (category_id, title, content, photolocation_id, photosize_id, photo_link, viewcount, createdate, modifieddate, adspace_id, testtf)
-        VALUES ($1, $2, $3, $4, $5, $6, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NULL, $7)
-        RETURNING *
-      `;
-            const values = [category, title, content, layout, size, images[0], testtf];
-            const result = await client.query(query, values);
+            const postQuery = `
+                INSERT INTO blog2.post (category_id, title, content, photolocation_id, photosize_id, photo_link, viewcount, createdate, modifieddate, adspace_id, testtf)
+                VALUES ($1, $2, $3, $4, $5, $6, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NULL, $7)
+                RETURNING post_id
+            `;
+            const postValues = [category, title, content, layout, size, images[0], testtf];
+            const postResult = await client.query(postQuery, postValues);
+
+            const postId = postResult.rows[0].post_id;
+
+            // Insert into pp table
+            const ppQuery = `
+                INSERT INTO pp (post_id, category_id, localHostTF)
+                VALUES ($1, $2, $3)
+            `;
+            const ppValues = [postId, category, testtf];
+            await client.query(ppQuery, ppValues);
 
             // Log the result for debugging
-            console.log('Post created:', result.rows[0]);
+            console.log('Post created:', postResult.rows[0]);
         } else if (type === 'project') {
             const projectQuery = `
-        INSERT INTO blog2.project (category_id, title, sectionqty, viewcount, createdate, modifieddate, adspace_id, testtf)
-        VALUES ($1, $2, $3, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NULL, $4)
-        RETURNING project_id
-      `;
+                INSERT INTO blog2.project (category_id, title, sectionqty, viewcount, createdate, modifieddate, adspace_id, testtf)
+                VALUES ($1, $2, $3, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NULL, $4)
+                RETURNING project_id
+            `;
             const projectValues = [category, title, sectionQty, testtf];
             const projectResult = await client.query(projectQuery, projectValues);
 
             const projectId = projectResult.rows[0].project_id;
+
+            // Insert into pp table
+            const ppQuery = `
+                INSERT INTO pp (project_id, category_id, localHostTF)
+                VALUES ($1, $2, $3)
+            `;
+            const ppValues = [projectId, category, testtf];
+            await client.query(ppQuery, ppValues);
 
             // Log the result for debugging
             console.log('Project created:', projectResult.rows[0]);
 
             for (let i = 0; i < sectionQty; i++) {
                 const sectionQuery = `
-          INSERT INTO blog2.projectsection (project_id, category_id, subheader, content, photolocation_id, photosize_id, photo_link, viewcount, createdate, modifieddate)
-          VALUES ($1, $2, $3, $4, $5, $6, $7, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-        `;
+                    INSERT INTO blog2.projectsection (project_id, category_id, subheader, content, photolocation_id, photosize_id, photo_link, viewcount, createdate, modifieddate)
+                    VALUES ($1, $2, $3, $4, $5, $6, $7, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                `;
                 const sectionValues = [projectId, category, sectionTitles[i], sectionContents[i], layout, size, images[i + 1] || null];
                 await client.query(sectionQuery, sectionValues);
             }
@@ -475,10 +525,11 @@ app.post('/admin', upload.array('images', 10), async (req, res) => {
 
         res.redirect('/');
     } catch (err) {
-        console.error('Error creating post', err);
+        console.error('Error creating post or project', err);
         res.status(500).json({ error: 'Database error' });
     }
 });
+
 
 
 const PORT = process.env.PORT || 3000;

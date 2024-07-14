@@ -39,7 +39,7 @@
 
 
 
-<body class="bg-dark text-white">
+<!-- <body class="bg-dark text-white">
     <%- include('nav') %>
     <div class="container mt-2 intro">
         <h4 class="text-center">Welcome to my blog.<br>Below you'll see recent and pinned posts, as well a link to my merch store.<br>Up above you can go to specific blog categories and see all the posts associated to them.<br>Feel free to subscribe to them all at this link or subscribe to individual ones from within the above categories.<br> Enjoy!</h4>
@@ -68,6 +68,41 @@
         </div>
         </div>
     </div>
+</body> -->
+<body class="bg-dark text-white">
+    <%- include('nav') %>
+    <div class="container mt-2 intro">
+        <h4 class="text-center">
+            Welcome to my blog.<br>
+            Below you'll see recent and pinned posts, as well as a link to my merch store.<br>
+            Up above you can go to specific blog categories and see all the posts associated with them.<br>
+            Feel free to subscribe to them all at this link or subscribe to individual ones from within the above categories.<br>
+            Enjoy!
+        </h4>
+    </div>
+    <div class="container mt-5">
+        <div class="posts mt-4">
+            <div class="row">
+                <% categories.forEach(category => { %>
+                <% const recentEntry = entries[category.id]; %>
+                <% if (recentEntry) { %>
+                <div class="col-md-4">
+                    <h2 class="category-header"><%= category.categoryname %></h2>
+                    <div class="post-container" onclick="window.location.href='/post/<%= recentEntry.category_id %>/<%= recentEntry.pp_id %>'">
+                        <h3><%= recentEntry.title %></h3>
+                        <p><%= new Date(recentEntry.createdate).toLocaleDateString() %></p>
+
+                        <% if (recentEntry.photo_link) { %>
+                        <img src="<%= recentEntry.photo_link %>" class="img-fluid" alt="Post Image">
+                        <% } %>
+                    </div>
+                </div>
+                <% } %>
+                <% }); %>
+            </div>
+        </div>
+    </div>
 </body>
+
 
 </html>
