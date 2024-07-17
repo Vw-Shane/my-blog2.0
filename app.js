@@ -1,183 +1,4 @@
-// const express = require('express');
-// const app = express();
-// const session = require('express-session');
-// const bodyParser = require('body-parser');
-// const path = require('path');
-// const multer = require('multer');
-// const cloudinary = require('cloudinary').v2;
-// const { CloudinaryStorage } = require('multer-storage-cloudinary');
-// const { v4: uuidv4 } = require('uuid'); // Add this line to import UUID package
-// const { Client } = require('pg');
-// require('dotenv').config();
-// const adminPassword2 = process.env.ADMIN_PASSWORD2;
 
-// const client = new Client({
-//   host: process.env.DATABASE_HOST,
-//   port: process.env.DATABASE_PORT,
-//   database: process.env.DATABASE_NAME,
-//   user: process.env.DATABASE_USER,
-//   password: process.env.DATABASE_PASSWORD,
-//   connectionString: process.env.DATABASE_URL,
-//   ssl: {
-//     rejectUnauthorized: false
-//   }
-// });
-
-// cloudinary.config({
-//   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-//   api_key: process.env.CLOUDINARY_API_KEY,
-//   api_secret: process.env.CLOUDINARY_API_SECRET
-// });
-
-// const storage = new CloudinaryStorage({
-//   cloudinary: cloudinary,
-//   params: {
-//     folder: 'blog_images',
-//     format: async (req, file) => 'png',
-//     public_id: (req, file) => file.originalname,
-//     transformation: [{ width: 400, height: 400, crop: 'limit' }]
-//   },
-// });
-
-// client.connect(err => {
-//   if (err) {
-//     console.error('Connection error', err.stack);
-//   } else {
-//     console.log('Connected to the database');
-//   }
-// });
-
-// const upload = multer({ storage });
-
-// app.use(session({
-//   secret: 'your_secret_key',
-//   resave: false,
-//   saveUninitialized: true,
-// }));
-
-// app.use(bodyParser.urlencoded({ extended: true }));
-
-// app.use(express.static(path.join(__dirname, 'public')));
-
-// app.set('view engine', 'ejs');
-// app.set('views', path.join(__dirname, 'views'));
-
-// const posts = [];
-
-// // Define middleware to fetch categories
-// const fetchCategoriesMiddleware = async (req, res, next) => {
-//   try {
-//     const query = 'SELECT categoryName FROM blog2.categories'; // Adjust schema name if necessary
-//     const result = await client.query(query);
-//     const categories = result.rows.map(row => row.categoryname); // Extract category names
-
-//     res.locals.categories = categories; // Make categories available in res.locals
-
-//     next(); // Proceed to next middleware or route handler
-//   } catch (err) {
-//     console.error('Error fetching categories', err);
-//     res.locals.categories = []; // Set categories to empty array or handle error
-//     next(); // Proceed to next middleware or route handler
-//   }
-// };
-
-// app.use(fetchCategoriesMiddleware);
-// // const categories = ['Legos', 'Just Photos', 'Automotive']; // Define your categories here
-// // Middleware to check if user is authenticated
-// function isAuthenticated(req, res, next) {
-//   if (req.session.authenticated) {
-//     return next();
-//   }
-//   res.redirect('/login');
-// }
-
-// // app.get('/', async (req, res) => {
-// //   try {
-// //     const query = 'SELECT * FROM categories'; // Adjust SQL query as per your table structure
-// //     const result = await client.query(query);
-// //     const categories = result.rows; // Assuming result.rows contains the fetched categories
-
-// //     res.render('index', { posts, categories });
-// //   } catch (err) {
-// //     console.error('Error executing query', err);
-// //     res.status(500).json({ error: 'Database error' });
-// //   }
-// // });
-// app.get('/', async (req, res) => {
-//   try {
-
-
-//     res.render('index', { posts, categories: res.locals.categories });
-//   } catch (err) {
-//     console.error('Error executing query', err);
-//     res.status(500).json({ error: 'Database error' });
-//   }
-// });
-
-
-// app.get('/post/:category/:id', (req, res) => {
-//   const post = posts.find(p => p.id === req.params.id);
-//   res.render('post', { post,categories: res.locals.categories });
-// });
-
-// app.get('/admin', isAuthenticated, async(req, res) => {
-// res.render('admin', { categories: res.locals.categories });
-//  // res.render('admin', { categories }); // Pass categories to the admin view
-// });
-
-// app.get('/login', (req, res) => {
-//   res.render('login', { error: null });
-// });
-
-// app.post('/login', (req, res) => {
-//   const { password } = req.body;
-//   if (password === adminPassword2) {
-//     req.session.authenticated = true;
-//     res.redirect('/admin');
-//   } else {
-//     res.render('login', { error: 'Incorrect password' });
-//   }
-// });
-
-
-
-// // app.post('/admin', upload.array('images', 10), async (req, res) => {
-// //   console.log('Form data received:', req.body); // Check if form data is received
-// //   console.log('File data received:', req.files); // Check if file data is received
-// //   const { title, content, category, layout, size, qtyPerRow } = req.body;
-// //   const images = req.files ? req.files.map(file => file.path) : [];
-
-// //   posts.push({ title, content, category, date: new Date(), images, layout, size, qtyPerRow });
-
-// //   res.redirect('/');
-// // });
-// //app.post('/admin', upload.single('image'), async (req, res) => {
-// app.post('/admin', upload.array('images', 10), async (req, res) => {
-//   console.log('Form data received:', req.body); // Check if form data is received
-//   console.log('File data received:', req.files); // Check if file data is received
-//   const { title, content, category, layout, size, qtyPerRow } = req.body;
-//   const images = req.files ? req.files.map(file => file.path) : [];
-
-//   const newPost = {
-//     id: uuidv4(), // Generate a unique ID for the post
-//     title,
-//     content,
-//     category,
-//     date: new Date(),
-//     images,
-//     layout,
-//     size,
-//     qtyPerRow
-//   };
-
-//   posts.push(newPost);
-
-//   res.redirect('/');
-// });
-// const PORT = process.env.PORT || 3000;
-// app.listen(PORT, () => {
-//   console.log(`Server is running on port ${PORT}`);
-// });
 
 const express = require('express');
 const app = express();
@@ -216,7 +37,7 @@ const storage = new CloudinaryStorage({
         folder: 'blog_images',
         format: async (req, file) => 'png',
         public_id: (req, file) => file.originalname,
-        transformation: [{ width: 400, height: 400, crop: 'limit' }]
+      //  transformation: [{ width: 400, height: 400, crop: 'limit' }]
     },
 });
 
@@ -268,10 +89,10 @@ function isAuthenticated(req, res, next) {
 
 app.get('/', async (req, res) => {
     try {
-        const isLocalhost = req.get('host') === 'localhost:3000';
+        
         const categoriesResult = await client.query('SELECT * FROM blog2.categories ORDER BY id');
         const categories = categoriesResult.rows;
-
+const isLocalhost = req.get('host') === 'localhost:3000';
         const ppResult = await client.query(`
             SELECT pp.*,
               coalesce(pjt.title,pst.title) as title,
@@ -313,56 +134,7 @@ app.get('/', async (req, res) => {
     }
 });
 
-// app.get('/post/:category_id/:id', async (req, res) => {
-//     try {
-//         const { id } = req.params;
 
-//         // Fetch the pp entry using the provided id
-//         const ppQuery = 'SELECT * FROM pp WHERE pp_id = $1';
-//         const ppValues = [id];
-//         const ppResult = await client.query(ppQuery, ppValues);
-//         const ppEntry = ppResult.rows[0];
-
-//         if (!ppEntry) {
-//             return res.status(404).json({ error: 'Entry not found in pp table' });
-//         }
-
-//         if (ppEntry.post_id) {
-//             // Fetch the post if post_id is present
-//             const postQuery = 'SELECT * FROM blog2.post WHERE post_id = $1';
-//             const postValues = [ppEntry.post_id];
-//             const postResult = await client.query(postQuery, postValues);
-//             const post = postResult.rows[0];
-
-//             if (post) {
-//                 return res.render('post', { post });
-//             }
-//         } else if (ppEntry.project_id) {
-//             // Fetch the project if project_id is present
-//             const projectQuery = 'SELECT * FROM blog2.project WHERE project_id = $1';
-//             const projectValues = [ppEntry.project_id];
-//             const projectResult = await client.query(projectQuery, projectValues);
-//             const project = projectResult.rows[0];
-
-//             if (!project) {
-//                 return res.status(404).json({ error: 'Project not found' });
-//             }
-
-//             // Fetch the project sections
-//             const sectionsQuery = 'SELECT * FROM blog2.projectsection WHERE project_id = $1';
-//             const sectionsValues = [ppEntry.project_id];
-//             const sectionsResult = await client.query(sectionsQuery, sectionsValues);
-//             const sections = sectionsResult.rows;
-
-//             return res.render('project', { project, sections });
-//         } else {
-//             return res.status(404).json({ error: 'No associated post or project found' });
-//         }
-//     } catch (err) {
-//         console.error('Error fetching post or project', err);
-//         res.status(500).json({ error: 'Database error' });
-//     }
-// });
 
 app.get('/post/:category_id/:pp_id', async (req, res) => {
     try {
@@ -392,8 +164,16 @@ app.get('/post/:category_id/:pp_id', async (req, res) => {
                 return res.status(404).json({ error: 'Post not found' });
             }
 
+    // Fetch the photo size for the post
+            const photoSizeQuery = `
+                SELECT value FROM blog2.photoSize WHERE size_id = $1
+            `;
+            const photoSizeValues = [post.photosize_id];
+            const photoSizeResult = await client.query(photoSizeQuery, photoSizeValues);
+            const photoSize = photoSizeResult.rows[0].value;
+
             // Render the post view
-            return res.render('post', { post, category_id });
+            return res.render('post', { post, category_id, photoSize });
 
         } else if (ppEntry.project_id) {
             // Fetch the project
@@ -422,6 +202,7 @@ app.get('/post/:category_id/:pp_id', async (req, res) => {
         res.status(500).json({ error: 'Database error' });
     }
 });
+
 
 app.get('/admin', isAuthenticated, async (req, res) => {
     try {
@@ -454,6 +235,59 @@ app.post('/login', (req, res) => {
         res.render('login', { error: 'Incorrect password' });
     }
 });
+async function getAllCategories() {
+    const query = 'SELECT * FROM blog2.categories ORDER BY id';
+    const result = await client.query(query);
+    return result.rows;
+}
+
+const getEntriesByCategory = async (categoryId, isLocalhost) => {
+    const query = `
+        SELECT pp.*,
+          coalesce(pjt.title,pst.title) as title,
+          coalesce(pjt.createdate,pst.createdate) as createdate,
+          c.categoryname AS category_name
+        FROM pp 
+        JOIN blog2.categories c ON pp.category_id = c.id
+        LEFT JOIN blog2.post pst ON pp.post_id = pst.post_id AND c.id = pst.category_id
+        LEFT JOIN blog2.project pjt ON pp.project_id = pjt.project_id AND c.id = pjt.category_id
+        WHERE pp.category_id = $1 AND ($2 OR pp.localHostTF = false)  -- Check for localhost or localhostTF = 0
+        ORDER BY pp.pp_id DESC
+    `;
+    const values = [categoryId, isLocalhost];
+    const result = await client.query(query, values);
+    return result.rows;
+};
+
+
+app.get('/categories', async (req, res) => {
+    try {
+const isLocalhost = req.get('host') === 'localhost:3000';
+        const categories = await getAllCategories(); // Fetch all categories
+        const entries = {};
+
+        for (const category of categories) {
+            // Fetch all entries for each category with the localhost condition
+            const categoryEntries = await getEntriesByCategory(category.id, isLocalhost);
+            if (categoryEntries.length > 0) {
+                entries[category.id] = categoryEntries;
+            }
+        }
+
+        // Render the allCategories view with the filtered entries and categories
+        res.render('allCategories', { categories: categories.filter(category => entries[category.id]), entries });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server Error');
+    }
+});
+
+
+
+
+
+
+
 app.post('/admin', upload.array('images', 10), async (req, res) => {
     try {
         const { type, title, content, category, layout, size, sectionQty, sectionTitles, sectionContents, testtf } = req.body;
