@@ -252,8 +252,7 @@ const getEntriesByCategory = async (categoryId, isLocalhost) => {
         LEFT JOIN blog2.post pst ON pp.post_id = pst.post_id AND c.id = pst.category_id
         LEFT JOIN blog2.project pjt ON pp.project_id = pjt.project_id AND c.id = pjt.category_id
         WHERE pp.category_id = $1 
-                  AND (NOT $2 OR pp.localHostTF = false)
-
+        AND ($2 OR pp.localHostTF = '')  -- Check for localhost or localhostTF = 0
         ORDER BY pp.pp_id DESC
     `;
     const values = [categoryId, isLocalhost];
