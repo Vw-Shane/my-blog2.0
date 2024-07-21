@@ -1,81 +1,3 @@
-<!-- <!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Blog</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/styles.css">
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-    <style>
-    .post-image-top img {
-        display: block;
-        margin: 0 auto 20px;
-    }
-
-    .post-image-bottom img {
-        display: block;
-        margin: 20px auto 0;
-    }
-
-    .post-image-left {
-        display: flex;
-    }
-
-    .post-image-left img {
-        margin-right: 20px;
-    }
-
-    .post-image-right {
-        display: flex;
-        flex-direction: row-reverse;
-    }
-
-    .post-image-right img {
-        margin-left: 20px;
-    }
-
-    .photo-small {
-        max-width: 25%;
-        height: auto;
-    }
-
-    .photo-medium {
-        max-width: 50%;
-        height: auto;
-    }
-
-    .photo-large {
-        width: 100%;
-        height: auto;
-    }
-    </style>
-</head>
-
-<body class="bg-dark text-white">
-    <%- include('nav') %>
-    <div class="container mt-5">
-        <h1 class="text-center">
-            <%= post.title %>
-        </h1>
-        <div class="post mt-4">
-            <p>
-                <%= post.content %>
-            </p>
-            <div>
-                <% if (post.photo_link) { %>
-                <img src="<%= post.photo_link %>" class="img-fluid <%= photoSize %>" alt="Post Image">
-                <% } %>
-            </div>
-        </div>
-    </div>
-</body>
-
-</html> -->
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -135,6 +57,10 @@
             width: 100%;
             height: auto;
         }
+
+        .btn-navigation {
+            margin: 20px 0;
+        }
     </style>
 </head>
 
@@ -171,8 +97,16 @@
                 <% } %>
             </div>
         </div>
+        <!-- Navigation Buttons -->
+        <div class="btn-navigation text-center">
+            <% if (previousPost) { %>
+                <a href="/post/<%= previousPost.category_id %>/<%= previousPost.pp_id %>" class="btn btn-primary">Previous</a>
+            <% } %>
+            <% if (nextPost) { %>
+                <a href="/post/<%= nextPost.category_id %>/<%= nextPost.pp_id %>" class="btn btn-primary">Next</a>
+            <% } %>
+        </div>
     </div>
 </body>
-
 
 </html>
