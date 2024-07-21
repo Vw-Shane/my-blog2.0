@@ -104,37 +104,16 @@ const isLocalhost = req.get('host') === 'localhost:3000';
             left join blog2.project pjt on pp.project_id=pjt.project_id and c.id=pjt.category_id
             ORDER BY pp.pp_id DESC
          `);
-    //     const ppEntries = ppResult.rows;
-
-    //     const recentEntries = {};
-    //     categories.forEach(category => {
-    //         // Filter entries based on the current category
-    //         const categoryEntries = ppEntries.filter(entry => entry.category_id === category.id);
-
-    //         // Find the most recent entry considering the localhost condition
-    //         let recentEntry;
-    //         if (isLocalhost) {
-    //             // On localhost, include both localhostTF = 0 and localhostTF = 1
-    //             recentEntry = categoryEntries[0]; // Assuming entries are ordered by descending pp_id
-    //         } else {
-    //             // On non-localhost, only include entries with localhostTF = 0
-    //             recentEntry = categoryEntries.find(entry => !entry.localhosttf);
-    //         }
-
-    //         // Save the found entry to the result map if it exists
-    //         if (recentEntry) {
-    //             recentEntries[category.id] = recentEntry;
-    //         }
-    //     });
-
-    //     res.render('index', { entries: recentEntries, categories });
-    // } catch (err) {
     
         const ppEntries = ppResult.rows;
 
         // Create a set of category IDs that have associated entries in `pp`
-        const populatedCategoryIds = new Set(ppEntries.map(entry => entry.category_id));
-
+        // const populatedCategoryIds = new Set(ppEntries.map(entry => entry.category_id));
+        const populatedCategoryIds = new Set(
+            ppEntries
+                .filter(entry => isLocalhost || !entry.localhosttf)  // Filter based on localhosttf
+                .map(entry => entry.category_id)
+        );
         // Filter categories to include only those with populated entries
         const filteredCategories = categories.filter(category => populatedCategoryIds.has(category.id));
 
