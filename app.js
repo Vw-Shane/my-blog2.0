@@ -251,6 +251,13 @@ async function getAllCategories() {
     const result = await client.query(query);
     return result.rows;
 }
+async function getTheCategory(categoryId) {
+    const query = 'SELECT * FROM blog2.categories WHERE id = $1';
+    const result = await client.query(query, [categoryId]);
+
+    return result.rows[0]; // Assuming you need the single category detail
+}
+
 
 const getEntriesByCategory = async (categoryId, isLocalhost) => {
     const query = `
@@ -266,6 +273,7 @@ const getEntriesByCategory = async (categoryId, isLocalhost) => {
         AND ($2 OR pp.localHostTF != true)  -- Check for localhost or localhostTF = 0
         ORDER BY pp.pp_id DESC
     `;
+   
     const values = [categoryId, isLocalhost];
     const result = await client.query(query, values);
     return result.rows;
@@ -276,11 +284,14 @@ app.get('/categories', async (req, res) => {
     try {
 const isLocalhost = req.get('host') === 'localhost:3000';
         const categories = await getAllCategories(); // Fetch all categories
+
         const entries = {};
 
         for (const category of categories) {
+    
             // Fetch all entries for each category with the localhost condition
             const categoryEntries = await getEntriesByCategory(category.id, isLocalhost);
+
             if (categoryEntries.length > 0) {
                 entries[category.id] = categoryEntries;
             }
@@ -295,6 +306,32 @@ const isLocalhost = req.get('host') === 'localhost:3000';
 });
 
 
+app.get('/categories/:category_id', async (req, res) => {
+    try {
+        const isLocalhost = req.get('host') === 'localhost:3000';
+        const { category_id } = req.params;
+
+        if (!category_id) {
+            return res.status(400).send('Category ID is required');
+        }
+
+        // Fetch the category based on category_id
+        const category = await getTheCategory(category_id);
+
+     
+        const entries = {};
+
+        // Fetch all entries for the current category with the localhost condition
+        const categoryEntries = await getEntriesByCategory(category.id, isLocalhost);
+        entries[category.id] = categoryEntries;
+
+        // Render the view with the category and entries
+        res.render('theCat', { category, entries });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server Error');
+    }
+});
 
 
 

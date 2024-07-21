@@ -11,14 +11,15 @@
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Categories
                 </a>
-                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+        
+                                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                     <% categories.forEach(category => { %>
-                        <a class="dropdown-item" href="/categories"><%= category.categoryname %></a>
+                        <a class="dropdown-item" href="/categories/<%= category.id %>"><%= category.categoryname %></a>
                     <% }); %>
                 </div>
             </li>
             <li class="nav-item">
-                <a class="nav-link disabled" href="#">Disabled</a>
+                <a class="nav-link " href="/categories">All</a>
             </li>
         </ul>
         <form class="form-inline my-2 my-lg-0">
