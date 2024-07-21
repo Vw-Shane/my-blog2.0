@@ -270,7 +270,7 @@ app.get('/adminCreate', isAuthenticated, async (req, res) => {
         const sizeResult = await client.query('SELECT size_id, value FROM blog2.photoSize ORDER BY size_id');
         const sizeOptions = sizeResult.rows;
 
-        res.render('admincreate', { categories, layoutOptions, sizeOptions });
+        res.render('adminCreate', { categories, layoutOptions, sizeOptions });
     } catch (err) {
         console.error('Error fetching categories, layoutOptions, or sizeOptions', err);
         res.status(500).json({ error: 'Database error' });
