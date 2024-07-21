@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Edit Post/Project</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css">
+</head>
+
+<body class="bg-dark text-white">
+    <div class="container mt-5">
+        <h1 class="text-center">Edit Post/Project</h1>
+        <form id="editForm" action="/admin/edit" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="postProject">Post/Project</label>
+                <select class="form-control" id="postProject" name="postProject" required>
+                    <option value="">Select Post/Project</option>
+                    <!-- Options will be populated dynamically with JavaScript -->
+                </select>
+            </div>
+            <div id="formContainer">
+                <div class="form-group">
+                    <label for="type">Type</label>
+                    <select class="form-control" id="type" name="type" required>
+                        <option value="post">Post</option>
+                        <option value="project">Project</option>
+                    </select>
+                </div>
+                <div class="form-group" id="sectionQtyDiv" style="display: none;">
+                    <label for="sectionQty">Number of Sections</label>
+                    <select class="form-control" id="sectionQty" name="sectionQty">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="title">Title</label>
+                    <input type="text" class="form-control" id="title" name="title" required>
+                </div>
+                <div class="form-group">
+                    <label for="content">Content</label>
+                    <textarea class="form-control" id="content" name="content" rows="5" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="category">Category</label>
+                    <select class="form-control" id="category" name="category" required>
+                        <% categories.forEach(category => { %>
+                        <option value="<%= category.id %>">
+                            <%= category.categoryname %>
+                        </option>
+                        <% }); %>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="layout">Layout</label>
+                    <select class="form-control" id="layout" name="layout" required>
+                        <% layoutOptions.forEach(layout => { %>
+                        <option value="<%= layout.placement_id %>">
+                            <%= layout.value %>
+                        </option>
+                        <% }); %>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="size">Image Size</label>
+                    <select class="form-control" id="size" name="size" required>
+                        <% sizeOptions.forEach(size => { %>
+                        <option value="<%= size.size_id %>">
+                            <%= size.value %>
+                        </option>
+                        <% }); %>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="images">Images</label>
+                    <input type="file" class="form-control-file" id="images" name="images" multiple>
+                </div>
+                <!-- <div class="form-group">
+                <input type="checkbox" id="testtf" name="testtf" value='true'>
+                <label for="testtf">Test T/F</label>
+            </div> -->
+                <div class="form-group">
+                    <label for="selectState">Test T/F</label>
+                    <select id="testtf" name="testtf">
+                        <option value="true">True</option>
+                        <option value="false">False</option>
+                    </select>
+                </div>
+                <!-- The existing form layout goes here -->
+                <!-- This will be populated with the existing post/project data when selected -->
+            </div>
+            <button type="submit" class="btn btn-primary">Update</button>
+        </form>
+    </div>
+    <script>
+    document.addEventListener('DOMContentLoaded', async function() {
+        const postProjectSelect = document.getElementById('postProject');
+        try {
+            const response = await fetch('/admin/posts');
+            const posts = await response.json();
+
+            posts.forEach(post => {
+                const option = document.createElement('option');
+                option.value = post.id;
+                option.textContent = `${post.categoryname} - ${post.id} - ${post.title} (Created: ${new Date(post.createdate).toLocaleDateString()})`;
+                postProjectSelect.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Error fetching posts/projects:', error);
+        }
+    });
+
+    document.getElementById('postProject').addEventListener('change', async function() {
+        const postId = this.value;
+        const formContainer = document.getElementById('formContainer');
+
+        if (postId) {
+            try {
+                const response = await fetch(`/admin/post/${postId}`);
+                const post = await response.json();
+
+                // Populate the form with the existing post/project data
+                document.getElementById('title').value = post.title;
+                document.getElementById('content').value = post.content;
+                document.getElementById('category').value = post.category_id;
+                document.getElementById('layout').value = post.photolocation_id;
+                document.getElementById('size').value = post.photosize_id;
+                document.getElementById('testtf').value = post.testtf;
+
+                if (post.type === 'project') {
+                    document.getElementById('sectionQtyDiv').style.display = 'block';
+                    document.getElementById('sectionQty').value = post.sectionqty;
+
+                    // Populate project sections
+                    formContainer.innerHTML = '';
+                    post.sections.forEach((section, index) => {
+                        formContainer.innerHTML += `
+                            <h3>Section ${index + 1}</h3>
+                            <div class="form-group">
+                                <label for="sectionTitle${index}">Section Title</label>
+                                <input type="text" class="form-control" id="sectionTitle${index}" name="sectionTitles[]" value="${section.subheader}" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="sectionContent${index}">Section Content</label>
+                                <textarea class="form-control" id="sectionContent${index}" name="sectionContents[]" rows="5" required>${section.content}</textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="sectionImages${index}">Section Images</label>
+                                <input type="file" class="form-control-file" id="sectionImages${index}" name="sectionImages${index}[]" multiple>
+                            </div>
+                        `;
+                    });
+                } else {
+                    document.getElementById('sectionQtyDiv').style.display = 'none';
+                    formContainer.innerHTML = '';
+                }
+            } catch (error) {
+                console.error('Error fetching post/project data:', error);
+            }
+        } else {
+            formContainer.innerHTML = '';
+        }
+    });
+    </script>
+</body>
+
+</html>

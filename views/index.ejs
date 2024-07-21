@@ -10,7 +10,7 @@
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     <style>
-    .post-container {
+    /*.post-container {
         cursor: pointer;
         max-width: 15vw;
         width: 100%;
@@ -21,7 +21,7 @@
         color: #333;
         margin-bottom: 0.5vw;
         border-radius: 10px;
-    }
+    }*/
 
     .post-container img {
         width: 100%;
@@ -32,6 +32,24 @@
 
     .intro {
         max-width: 100%;
+    }
+    .col-md-4{
+   
+        padding-bottom: 30px;
+    } 
+    .card-body {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+       
+      
+        margin-bottom: 20px;
+        padding: 0.5vw;
+        background: #f8f9fa;
+        color: #333;
+        margin-bottom: 0.5vw;
+        border-radius: 10px;
+        /* Ensure the card body takes the full height of the card */
     }
     </style>
 </head>
@@ -84,21 +102,25 @@
                 <% const recentEntry = entries[category.id]; %>
                 <% if (recentEntry) { %>
                 <div class="col-md-4">
-                    <h2 class="category-header">
-                        <%= category.categoryname %>
-                    </h2>
-                    <div class="post-container" onclick="window.location.href='/post/<%= recentEntry.category_id %>/<%= recentEntry.pp_id %>'">
-                        <h3>
-                            <%= recentEntry.title %>
-                        </h3>
-                        <p>
-                            <%= new Date(recentEntry.createdate).toLocaleDateString() %>
-                        </p>
-                        <% if (recentEntry.photo_link) { %>
-                        <img src="<%= recentEntry.photo_link %>" class="img-fluid" alt="Post Image">
-                        <% } %>
+                    <div class="card category-card bg-light text-dark" onclick="window.location.href='/post/<%= recentEntry.category_id %>/<%= recentEntry.pp_id %>'">
+                    <div class="card-body">
+                        <h2 class="category-header">
+                            <%= category.categoryname %>
+                        </h2>
+                        <div class="post-container" >
+                            <h3>
+                                <%= recentEntry.title %>
+                            </h3>
+                            <p>
+                                <%= new Date(recentEntry.createdate).toLocaleDateString() %>
+                            </p>
+                            <% if (recentEntry.photo_link) { %>
+                            <img src="<%= recentEntry.photo_link %>" class="img-fluid" alt="Post Image">
+                            <% } %>
+                        </div>
                     </div>
                 </div>
+            </div>
                 <% } %>
                 <% }); %>
             </div>

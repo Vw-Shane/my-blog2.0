@@ -76,7 +76,6 @@
 
 </html> -->
 
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -151,11 +150,29 @@
             </p>
             <div>
                 <% if (post.photo_link) { %>
-                <img src="<%= post.photo_link %>" class="img-fluid <%= photoSize %>" alt="Post Image">
+                    <% if (post.photo_link.includes('youtube.com/watch') || post.photo_link.includes('youtu.be/')) { %>
+                        <% 
+                            // Extract video ID from URL
+                            let videoId = '';
+                            const url = new URL(post.photo_link);
+                            if (url.hostname === 'www.youtube.com') {
+                                videoId = url.searchParams.get('v');
+                            } else if (url.hostname === 'youtu.be') {
+                                videoId = url.pathname.slice(1);
+                            }
+                            const embedUrl = `https://www.youtube.com/embed/${videoId}`;
+                        %>
+                        <div class="embed-responsive embed-responsive-16by9">
+                            <iframe class="embed-responsive-item" src="<%= embedUrl %>" allowfullscreen></iframe>
+                        </div>
+                    <% } else { %>
+                        <img src="<%= post.photo_link %>" class="img-fluid <%= photoSize %>" alt="Post Image">
+                    <% } %>
                 <% } %>
             </div>
         </div>
     </div>
 </body>
+
 
 </html>
