@@ -145,10 +145,11 @@ const isLocalhost = req.get('host') === 'localhost:3000';
     }
 });
 
+
+
 app.get('/post/:category_id/:pp_id', async (req, res) => {
     try {
         const { category_id, pp_id } = req.params;
-        const isLocalHost = req.hostname === 'localhost';
 
         // Fetch the pp entry using the provided pp_id
         const ppQuery = 'SELECT * FROM pp WHERE pp_id = $1';
@@ -161,7 +162,7 @@ app.get('/post/:category_id/:pp_id', async (req, res) => {
         }
 
         // Fetch the post or project based on ppEntry.post_id or ppEntry.project_id
-        let post, project, sections, previousPost, nextPost;
+        let post, project, sections;
 
         if (ppEntry.post_id) {
             // Fetch the post
@@ -174,42 +175,16 @@ app.get('/post/:category_id/:pp_id', async (req, res) => {
                 return res.status(404).json({ error: 'Post not found' });
             }
 
-            // Fetch the photo size for the post
-            const photoSizeQuery = 'SELECT value FROM blog2.photoSize WHERE size_id = $1';
+    // Fetch the photo size for the post
+            const photoSizeQuery = `
+                SELECT value FROM blog2.photoSize WHERE size_id = $1
+            `;
             const photoSizeValues = [post.photosize_id];
             const photoSizeResult = await client.query(photoSizeQuery, photoSizeValues);
             const photoSize = photoSizeResult.rows[0].value;
 
-            // Fetch the previous post for navigation
-            const prevQuery = `
-                SELECT p.*, pp.pp_id
-                FROM blog2.post p
-                JOIN pp ON pp.post_id = p.post_id
-                WHERE p.post_id < $1 AND pp.category_id = $2
-                ${isLocalHost ? '' : 'AND pp.LocalHostTF = false'}
-                ORDER BY p.post_id DESC
-                LIMIT 1
-            `;
-            const prevValues = [post.post_id, category_id];
-            const prevResult = await client.query(prevQuery, prevValues);
-            previousPost = prevResult.rows[0] || null;
-
-            // Fetch the next post for navigation
-            const nextQuery = `
-                SELECT p.*, pp.pp_id
-                FROM blog2.post p
-                JOIN pp ON pp.post_id = p.post_id
-                WHERE p.post_id > $1 AND pp.category_id = $2
-                ${isLocalHost ? '' : 'AND pp.LocalHostTF = false'}
-                ORDER BY p.post_id ASC
-                LIMIT 1
-            `;
-            const nextValues = [post.post_id, category_id];
-            const nextResult = await client.query(nextQuery, nextValues);
-            nextPost = nextResult.rows[0] || null;
-
             // Render the post view
-            return res.render('post', { post, category_id, photoSize, previousPost, nextPost });
+            return res.render('post', { post, category_id, photoSize });
 
         } else if (ppEntry.project_id) {
             // Fetch the project
@@ -238,8 +213,6 @@ app.get('/post/:category_id/:pp_id', async (req, res) => {
         res.status(500).json({ error: 'Database error' });
     }
 });
-
-
 
 
 app.get('/admin', isAuthenticated, async (req, res) => {
