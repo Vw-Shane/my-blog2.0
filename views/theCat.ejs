@@ -45,7 +45,7 @@
                 <div class="card-body">
                     <h5 class="card-title"><%= entry.title %></h5>
                     <p class="card-text"><%= new Date(entry.createdate).toDateString() %></p>
-                    <a href="/post/<%= entry.pp_id %>" class="btn btn-primary">Read More</a>
+                    <a href="/post/<%= category.id %>/<%= entry.pp_id %>" class="btn btn-primary">Read More</a>
                 </div>
             </div>
             <% }); %>
