@@ -145,11 +145,10 @@ const isLocalhost = req.get('host') === 'localhost:3000';
     }
 });
 
-
-
 app.get('/post/:category_id/:pp_id', async (req, res) => {
     try {
         const { category_id, pp_id } = req.params;
+        const isLocalHost = req.hostname === 'localhost';
 
         // Fetch the pp entry using the provided pp_id
         const ppQuery = 'SELECT * FROM pp WHERE pp_id = $1';
@@ -187,6 +186,7 @@ app.get('/post/:category_id/:pp_id', async (req, res) => {
                 FROM blog2.post p
                 JOIN pp ON pp.post_id = p.post_id
                 WHERE p.post_id < $1 AND pp.category_id = $2
+                ${isLocalHost ? '' : 'AND pp.LocalHostTF = false'}
                 ORDER BY p.post_id DESC
                 LIMIT 1
             `;
@@ -200,6 +200,7 @@ app.get('/post/:category_id/:pp_id', async (req, res) => {
                 FROM blog2.post p
                 JOIN pp ON pp.post_id = p.post_id
                 WHERE p.post_id > $1 AND pp.category_id = $2
+                ${isLocalHost ? '' : 'AND pp.LocalHostTF = false'}
                 ORDER BY p.post_id ASC
                 LIMIT 1
             `;
@@ -237,6 +238,7 @@ app.get('/post/:category_id/:pp_id', async (req, res) => {
         res.status(500).json({ error: 'Database error' });
     }
 });
+
 
 
 

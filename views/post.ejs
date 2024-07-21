@@ -99,11 +99,12 @@
         </div>
         <!-- Navigation Buttons -->
         <div class="btn-navigation text-center">
-            <% if (previousPost) { %>
-                <a href="/post/<%= previousPost.category_id %>/<%= previousPost.pp_id %>" class="btn btn-primary">Previous</a>
-            <% } %>
+          
             <% if (nextPost) { %>
                 <a href="/post/<%= nextPost.category_id %>/<%= nextPost.pp_id %>" class="btn btn-primary">Next</a>
+            <% } %>
+              <% if (previousPost) { %>
+                <a href="/post/<%= previousPost.category_id %>/<%= previousPost.pp_id %>" class="btn btn-primary">Previous</a>
             <% } %>
         </div>
     </div>
