@@ -97,7 +97,8 @@ const isLocalhost = req.get('host') === 'localhost:3000';
             SELECT pp.*,
               coalesce(pjt.title,pst.title) as title,
               coalesce(pjt.createdate,pst.createdate) as createdate, 
-              c.categoryname AS category_name
+              c.categoryname AS category_name,
+              pst.photo_link
             FROM pp 
             JOIN blog2.categories c ON pp.category_id = c.id
             left join blog2.post pst on pp.post_id=pst.post_id and c.id=pst.category_id
