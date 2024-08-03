@@ -139,7 +139,9 @@
                 <% const recentEntry = entries[category.id]; %>
                 <% if (recentEntry) { %>
                 <div class="col-md-4">
-                    <div class="card category-card <%= recentEntry.photo_link ? '' : 'no-image' %>" style="<%= recentEntry.photo_link ? `background-image: url('${recentEntry.photo_link}');` : '' %>" onclick="window.location.href='/post/<%= recentEntry.category_id %>/<%= recentEntry.post_id || recentEntry.project_id %>'">
+                    <div class="card category-card <%= recentEntry.photo_link ? '' : 'no-image' %>" style="<%= recentEntry.photo_link ? `background-image: url('${recentEntry.photo_link}');` : '' %>" onclick="window.location.href='/post/<%= recentEntry.category_id %>/<%= recentEntry.pp_id  %>'">
+  
+                        
                         <div class="card-body">
                             <h2 class="category-header">
                                 <%= category.categoryname %>
