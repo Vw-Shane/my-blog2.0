@@ -608,6 +608,80 @@ app.post('/adminCreate', upload.array('images', 10), async (req, res) => {
     }
 });
 
+// Route to render subscription page
+app.get('/subscribe', (req, res) => {
+    const frequenciesQuery = 'SELECT freq_id, name AS frequencyName FROM blog2.frequencies';
+
+    // Fetch frequencies and render the page
+client.query(frequenciesQuery)
+    .then(frequenciesResult => {
+        console.log(frequenciesResult.rows); // Log data for debugging
+        res.render('subscribe', {
+            categories: res.locals.categories, // Use categories from res.locals
+            frequencies: frequenciesResult.rows // Frequencies fetched from the database
+        });
+    })
+    .catch(err => {
+        console.error('Error rendering subscription page:', err);
+        res.status(500).send('An error occurred while fetching data.');
+    });
+
+
+});
+app.post('/subscribe', (req, res) => {
+    const { email, frequency, categories } = req.body;
+
+    // Validate input
+    if (!email || !frequency) {
+        return res.status(400).send('Email and frequency are required.');
+    }
+
+    // Insert into subscribers table
+    const insertSubscriberQuery = 'INSERT INTO subscribers (email, created_at) VALUES ($1, NOW()) RETURNING sub_id';
+
+    client.query(insertSubscriberQuery, [email])
+        .then(result => {
+            const subscriberId = result.rows[0].sub_id;
+
+            // Normalize categories from form (remove spaces and convert to lowercase)
+            const normalizedCategories = categories.map(category => category.replace(/\s+/g, '').toLowerCase());
+
+            // Define category columns and their normalized versions
+            const categoryColumns = [
+                'Automotive', 'Lego', 'justphotos', 'Entrepreneurial', 'Creative', 'General' // List all category columns
+            ];
+            const normalizedCategoryColumns = categoryColumns.map(column => column.replace(/\s+/g, '').toLowerCase());
+
+            // Create a set of columns with true/false values
+            const categoryUpdates = normalizedCategoryColumns.map((column, index) => {
+                const originalColumn = categoryColumns[index];
+                return `${originalColumn} = ${normalizedCategories.includes(column) ? 'TRUE' : 'FALSE'}`;
+            }).join(', ');
+
+            // Insert into catSub table with frequency_id
+            const insertOrUpdateCatSubQuery = `
+                INSERT INTO blog2.catSub (subscriber_id, frequency_id, ${categoryColumns.join(', ')})
+                VALUES ($1, $2, ${categoryColumns.map((_, i) => `$${i + 3}`).join(', ')})
+                ON CONFLICT (subscriber_id) DO UPDATE
+                SET frequency_id = EXCLUDED.frequency_id,
+                    ${categoryUpdates}`;
+            
+            // Prepare values for the query
+            const categoryValues = normalizedCategoryColumns.map(column => normalizedCategories.includes(column) ? true : false);
+
+            return client.query(insertOrUpdateCatSubQuery, [subscriberId, frequency, ...categoryValues]);
+        })
+        .then(() => {
+            // Success response
+            res.status(200).send('Subscription successful.');
+        })
+        .catch(err => {
+            console.error('Error processing subscription:', err);
+            res.status(500).send('An error occurred while processing your subscription.');
+        });
+});
+
+
 
 
 const PORT = process.env.PORT || 3000;
