@@ -438,7 +438,9 @@ const getEntriesByCategory = async (categoryId, isLocalhost) => {
         SELECT pp.*,
           coalesce(pjt.title,pst.title) as title,
           coalesce(pjt.createdate,pst.createdate) as createdate,
-          c.categoryname AS category_name
+          c.categoryname AS category_name,
+          /*coalesce(pjt.photo_link,pst.photo_link) as photo_link will need to update this */
+          pst.photo_link 
         FROM pp 
         JOIN blog2.categories c ON pp.category_id = c.id
         LEFT JOIN blog2.post pst ON pp.post_id = pst.post_id AND c.id = pst.category_id
@@ -511,10 +513,11 @@ app.get('/categories/:category_id', async (req, res) => {
 
 
 
-app.post('/admin', upload.array('images', 10), async (req, res) => {
+app.post('/adminCreate', upload.array('images', 10), async (req, res) => {
     try {
         const { type, title, content, category, layout, size, sectionQty, sectionTitles, sectionContents, testtf } = req.body;
         const images = req.files ? req.files.map(file => file.path) : [];
+
 
         // Log form values for debugging
         console.log('Form Values:', { type, title, content, category, layout, size, sectionQty, sectionTitles, sectionContents, testtf });
@@ -581,8 +584,9 @@ app.post('/admin', upload.array('images', 10), async (req, res) => {
         }
 
         res.redirect('/');
-    } catch (err) {
-        console.error('Error creating post or project', err);
+     } catch (err) {
+        console.error('Error creating post or project:', err.message);
+        console.error('Stack Trace:', err.stack);
         res.status(500).json({ error: 'Database error' });
     }
 });

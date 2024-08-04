@@ -1,0 +1,11 @@
+  <div class="shadow card category-card <%= entry.photo_link && !entry.photo_link.includes('youtube') ? '' : 'no-image' %>" style="<%= entry.photo_link ? `background-image: url('${entry.photo_link}');` : '' %>">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <%= entry.title %>
+                        </h5>
+                        <p class="card-text">
+                            <%= new Date(entry.createdate).toDateString() %>
+                        </p>
+                        <a href="/post/<%= category.id %>/<%= entry.pp_id %>" class="btn btn-primary">Read More</a>
+                    </div>
+                </div>

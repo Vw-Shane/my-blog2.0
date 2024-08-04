@@ -11,6 +11,52 @@
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     <style>
+        body{
+     background-color:  #3498db;
+}
+         .category-card {
+        position: relative;
+        background-size: cover;
+        background-position: center;
+        color: white;
+        overflow: hidden;
+        border: none;
+        border-radius: 0.25rem;
+        box-shadow: ;
+    }
+
+    .card-body {
+        position: relative;
+        z-index: 1;
+    }
+
+    .category-card .card-body h2,
+    .category-card .card-body h5,
+    .category-card .card-body p {
+        color: #f8f9fa;
+        ;
+        padding: 10px;
+        border-radius: 0.25rem;
+        background: rgba(0, 0, 0, 0.5);
+        /* Dark overlay for readability */
+    }
+
+    .category-card.no-image .card-body h2,
+    .category-card.no-image .card-body h5,
+    .category-card.no-image .card-body p {
+        background: transparent;
+        /* No overlay if there's no image */
+        color: black;
+    }
+    .btn-primary{
+/*        background-color: orange;*/
+        border-color: black;
+
+    }
+    .btn-primary:hover{
+        background-color: hotpink;
+        border-color: hotpink;
+    }
     .category-row {
         overflow-x: scroll;
         white-space: nowrap;
@@ -36,7 +82,7 @@
     </style>
 </head>
 
-<body class="bg-dark text-white">
+<body class=" text-white">
     <%- include('nav') %>
     <div class="container mt-5">
         <h1 class="text-center">All Categories</h1>
@@ -62,27 +108,28 @@
                     </div> -->
                 </div>
             </div>
-                <div class="category-row">
-                    <% entries[category.id].forEach(entry => { %>
-                    <div class="card category-card bg-light text-dark">
-                        <div class="card-body">
-                            <h5 class="card-title">
-                                <%= entry.title %>
-                            </h5>
-                            <p class="card-text">
-                                <%= entry.createdate.toDateString() %>
-                            </p>
-                            <a href="/post/<%= category.id %>/<%= entry.pp_id %>" class="btn btn-primary">Read More</a>
-                        </div>
+            <div class="category-row">
+                <% entries[category.id].forEach(entry => { %>
+              <!--   <div class="shadow card category-card <%= entry.photo_link && !entry.photo_link.includes('youtube') ? '' : 'no-image' %>" style="<%= entry.photo_link ? `background-image: url('${entry.photo_link}');` : '' %>">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <%= entry.title %>
+                        </h5>
+                        <p class="card-text">
+                            <%= new Date(entry.createdate).toDateString() %>
+                        </p>
+                        <a href="/post/<%= category.id %>/<%= entry.pp_id %>" class="btn btn-primary">Read More</a>
                     </div>
-                    <% }); %>
-                </div>
+                </div> -->
+                  <%- include('catCard', { entry: entry, category: category }) %>
+                <% }); %>
             </div>
-            <% } %>
-            <% }); %>
         </div>
+        <% } %>
+        <% }); %>
+    </div>
 </body>
-    <!--  <script>
+<!--  <script>
         function sortEntries(categoryId) {
             const sortBy = document.getElementById(`sort-options-${categoryId}`).value;
             const categoryRow = document.getElementById(`category-row-${categoryId}`);
