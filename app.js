@@ -161,6 +161,16 @@ app.get('/post/:category_id/:pp_id', async (req, res) => {
             return res.status(404).json({ error: 'Entry not found in pp table' });
         }
 
+        // Handle view count increment
+        if (ppEntry.post_id) {
+            // Increment view count for the post
+            await client.query('UPDATE blog2.post SET viewcount = viewcount + 1 WHERE post_id = $1', [ppEntry.post_id]);
+        } else if (ppEntry.project_id) {
+            // Increment view count for the project
+            await client.query('UPDATE blog2.project SET viewcount = viewcount + 1 WHERE project_id = $1', [ppEntry.project_id]);
+        }
+
+
         // Fetch the post or project based on ppEntry.post_id or ppEntry.project_id
         let post, project, sections, previousPost, nextPost;
 
@@ -679,6 +689,27 @@ app.post('/subscribe', (req, res) => {
             console.error('Error processing subscription:', err);
             res.status(500).send('An error occurred while processing your subscription.');
         });
+});
+
+app.get('/admin/top-posts', async (req, res) => {
+    try {
+        // Query to get the top 10 posts with view counts greater than 1, ordered by view count descending
+        const query = `
+            SELECT * FROM blog2.post
+            WHERE viewcount > 1
+            ORDER BY viewcount DESC
+            LIMIT 10
+        `;
+        
+        const result = await client.query(query);
+        const topPosts = result.rows;
+
+        // Render the top-posts view and pass the topPosts data
+        res.render('top-posts', { topPosts });
+    } catch (err) {
+        console.error('Error fetching top posts', err);
+        res.status(500).json({ error: 'Database error' });
+    }
 });
 
 
