@@ -1,0 +1,16 @@
+    .category-card {
+        display: inline-block;
+        margin-right: 20px;
+        width: 300px;
+        /* Set a fixed width for the cards */
+        height: 200px;
+        /* Set a fixed height for the cards */
+    }
+
+    .card-body {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 100%;
+        /* Ensure the card body takes the full height of the card */
+    }

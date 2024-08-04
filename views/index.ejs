@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Blog</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/CSS/postPreviewLayout.css">
+    <link rel="stylesheet" type="text/css" href="/CSS/mainLayout.css">
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     <style>
@@ -22,15 +23,7 @@
         margin-bottom: 0.5vw;
         border-radius: 10px;
     }*/
-body{
-     background-color:  #3498db;
-}
-a{
-    color:orange;
-}
-a:hover{
-    color:hotpink;
-}
+
     .post-container img {
         width: 100%;
         height: 100%;
@@ -46,66 +39,6 @@ a:hover{
     .col-md-4 {
 
         padding-bottom: 30px;
-    }
-
-    .card-body {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-
-
-        margin-bottom: 20px;
-        padding: 0.5vw;
-        /*        background: #f8f9fa;*/
-/*        color: #f8f9fa;*/
-        
-        margin-bottom: 0.5vw;
-        border-radius: 10px;
-        /* Ensure the card body takes the full height of the card */
-    }
-
-    .category-card {
-        position: relative;
-        background-size: cover;
-        background-position: center;
-        color: white;
-        overflow: hidden;
-        border: none;
-        border-radius: 0.25rem;
-        box-shadow: ;
-    }
-
-    .card-body {
-        position: relative;
-        z-index: 1;
-    }
-
-    .category-card .card-body h2,
-    .category-card .card-body h5,
-    .category-card .card-body p {
-        color: #f8f9fa;
-        ;
-        padding: 10px;
-        border-radius: 0.25rem;
-        background: rgba(0, 0, 0, 0.5);
-        /* Dark overlay for readability */
-    }
-
-    .category-card.no-image .card-body h2,
-    .category-card.no-image .card-body h5,
-    .category-card.no-image .card-body p {
-        background: transparent;
-        /* No overlay if there's no image */
-        color: black;
-    }
-    .btn-primary{
-/*        background-color: orange;*/
-        border-color: black;
-
-    }
-    .btn-primary:hover{
-        background-color: hotpink;
-        border-color: hotpink;
     }
     </style>
 </head>
@@ -140,6 +73,7 @@ a:hover{
     </div>
 </body> -->
 <!-- "bg-dark  -->
+
 <body class=" text-white">
     <%- include('nav') %>
     <div class="container mt-2 intro">
@@ -158,10 +92,7 @@ a:hover{
                 <% const recentEntry = entries[category.id]; %>
                 <% if (recentEntry) { %>
                 <div class="col-md-4">
-                    <div class="shadow card category-card <%= recentEntry.photo_link && !recentEntry.photo_link.includes('youtube') ? '' : 'no-image' %>" style="<%= recentEntry.photo_link ? `background-image: url('${recentEntry.photo_link}');` : '' %>" >
-  
-                 
-
+                    <div class="shadow card category-card <%= recentEntry.photo_link && !recentEntry.photo_link.includes('youtube') ? '' : 'no-image' %>" style="<%= recentEntry.photo_link ? `background-image: url('${recentEntry.photo_link}');` : '' %>">
                         <div class="card-body">
                             <h2 class="category-header">
                                 <%= category.categoryname %>
