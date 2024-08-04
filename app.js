@@ -296,6 +296,7 @@ app.get('/admin/edit', isAuthenticated, async (req, res) => {
     }
 });
 
+
 app.get('/admin/posts', isAuthenticated, async (req, res) => {
     try {
         const postsResult = await client.query(`
@@ -350,30 +351,46 @@ app.get('/admin/post/:postId', isAuthenticated, async (req, res) => {
 });
 app.post('/admin/edit', upload.array('images', 10), async (req, res) => {
     try {
-        const { postProject, type, title, content, category, layout, size, sectionQty, sectionTitles, sectionContents, testtf } = req.body;
+        const { postProject, type, title, content, category, layout, size, sectionQty, sectionTitles, sectionContents, testtf, replaceImage } = req.body;
         const images = req.files ? req.files.map(file => file.path) : [];
         const postId = postProject;
 
         // Log form values for debugging
-        console.log('Form Values:', { postProject, type, title, content, category, layout, size, sectionQty, sectionTitles, sectionContents, testtf });
+        console.log('Form Values:', { postProject, type, title, content, category, layout, size, sectionQty, sectionTitles, sectionContents, testtf, replaceImage });
 
         // Ensure all required fields are present
         if (!postId || !title || !content || !category || !layout || !size) {
             throw new Error('Missing required fields');
         }
 
+        // Get the current photo_link from the database if replacing image is not required
+        let currentPhotoLink;
+        if (replaceImage === 'no') {
+            // Fetch the current photo_link from the database
+            const currentPhotoQuery = 'SELECT photo_link FROM blog2.post WHERE post_id = $1';
+            const result = await client.query(currentPhotoQuery, [postId]);
+            if (result.rows.length > 0) {
+                currentPhotoLink = result.rows[0].photo_link;
+            } else {
+                throw new Error('Post not found');
+            }
+        }
+
         if (type === 'post') {
+            const photoLink = replaceImage === 'yes' && images.length > 0 ? images[0] : currentPhotoLink;
+
             const updatePostQuery = `
                 UPDATE blog2.post
                 SET title = $1, content = $2, category_id = $3, photolocation_id = $4, photosize_id = $5, photo_link = $6, modifieddate = CURRENT_TIMESTAMP, testtf = $7
                 WHERE post_id = $8
             `;
-            const updatePostValues = [title, content, category, layout, size, images[0], testtf, postId];
+            const updatePostValues = [title, content, category, layout, size, photoLink, testtf, postId];
             await client.query(updatePostQuery, updatePostValues);
 
             // Log the result for debugging
             console.log('Post updated:', postId);
-        } else if (type === 'project') {
+        }
+ else if (type === 'project') {
             const updateProjectQuery = `
                 UPDATE blog2.project
                 SET title = $1, category_id = $2, sectionqty = $3, modifieddate = CURRENT_TIMESTAMP, testtf = $4

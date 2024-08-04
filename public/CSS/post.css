@@ -1,0 +1,50 @@
+      .post-image-top img {
+            display: block;
+            margin: 0 auto 20px;
+        }
+
+        .post-image-bottom img {
+            display: block;
+            margin: 20px auto 0;
+        }
+
+        .post-image-left {
+            display: flex;
+        }
+
+        .post-image-left img {
+            margin-right: 20px;
+        }
+
+        .post-image-right {
+            display: flex;
+            flex-direction: row-reverse;
+        }
+
+        .post-image-right img {
+            margin-left: 20px;
+        }
+
+        .photo-small {
+            max-width: 25%;
+            height: auto;
+        }
+
+        .photo-medium {
+            max-width: 50%;
+            height: auto;
+        }
+
+        .photo-large {
+            width: 75%;
+            height: auto;
+        }
+
+        .photo-full {
+            width: 100%;
+            height: auto;
+        }
+
+        .btn-navigation {
+            margin: 20px 0;
+        }

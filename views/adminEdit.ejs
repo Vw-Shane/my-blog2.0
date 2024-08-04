@@ -76,14 +76,19 @@
                         <% }); %>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label for="images">Images</label>
-                    <input type="file" class="form-control-file" id="images" name="images" multiple>
-                </div>
-                <!-- <div class="form-group">
-                <input type="checkbox" id="testtf" name="testtf" value='true'>
-                <label for="testtf">Test T/F</label>
-            </div> -->
+<div class="form-group">
+    <label for="replaceImage">Replace Image</label>
+    <select class="form-control" id="replaceImage" name="replaceImage">
+        <option value="no" selected>No</option>
+        <option value="yes">Yes</option>
+    </select>
+</div>
+<div class="form-group" id="imageDiv" style="display: none;">
+    <label for="images">Images</label>
+    <input type="file" class="form-control-file" id="images" name="images" multiple>
+</div>
+
+        
                 <div class="form-group">
                     <label for="selectState">Test T/F</label>
                     <select id="testtf" name="testtf">
@@ -98,24 +103,40 @@
         </form>
     </div>
     <script>
-    document.addEventListener('DOMContentLoaded', async function() {
-        const postProjectSelect = document.getElementById('postProject');
-        try {
-            const response = await fetch('/admin/posts');
-            const posts = await response.json();
+  document.addEventListener('DOMContentLoaded', async function() {
+    const postProjectSelect = document.getElementById('postProject');
+    const replaceImageSelect = document.getElementById('replaceImage');
+    const imageDiv = document.getElementById('imageDiv');
 
-            posts.forEach(post => {
-                const option = document.createElement('option');
-                option.value = post.id;
-                option.textContent = `${post.categoryname} - ${post.id} - ${post.title} (Created: ${new Date(post.createdate).toLocaleDateString()})`;
-                postProjectSelect.appendChild(option);
-            });
-        } catch (error) {
-            console.error('Error fetching posts/projects:', error);
+    // Function to handle the imageDiv display based on replaceImageSelect value
+    function handleReplaceImageChange() {
+        if (replaceImageSelect.value === 'yes') {
+            imageDiv.style.display = 'block';
+        } else {
+            imageDiv.style.display = 'none';
         }
-    });
+    }
 
-    document.getElementById('postProject').addEventListener('change', async function() {
+    // Initially set the imageDiv display based on the default value
+    handleReplaceImageChange();
+
+    replaceImageSelect.addEventListener('change', handleReplaceImageChange);
+
+    try {
+        const response = await fetch('/admin/posts');
+        const posts = await response.json();
+
+        posts.forEach(post => {
+            const option = document.createElement('option');
+            option.value = post.id;
+            option.textContent = `${post.categoryname} - ${post.id} - ${post.title} (Created: ${new Date(post.createdate).toLocaleDateString()})`;
+            postProjectSelect.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Error fetching posts/projects:', error);
+    }
+
+    postProjectSelect.addEventListener('change', async function() {
         const postId = this.value;
         const formContainer = document.getElementById('formContainer');
 
@@ -132,14 +153,20 @@
                 document.getElementById('size').value = post.photosize_id;
                 document.getElementById('testtf').value = post.testtf;
 
+                // Handle the Replace Image option
+                replaceImageSelect.value = post.image ? 'yes' : 'no';
+                handleReplaceImageChange(); // Set visibility based on current value
+
                 if (post.type === 'project') {
                     document.getElementById('sectionQtyDiv').style.display = 'block';
                     document.getElementById('sectionQty').value = post.sectionqty;
 
-                    // Populate project sections
-                    formContainer.innerHTML = '';
+                    // Create a section container for project sections
+                    const sectionContainer = document.createElement('div');
+                    sectionContainer.id = 'sectionContainer';
+
                     post.sections.forEach((section, index) => {
-                        formContainer.innerHTML += `
+                        sectionContainer.innerHTML += `
                             <h3>Section ${index + 1}</h3>
                             <div class="form-group">
                                 <label for="sectionTitle${index}">Section Title</label>
@@ -155,17 +182,36 @@
                             </div>
                         `;
                     });
+
+                    // Clear previous sections and append new ones
+                    const existingSectionContainer = document.getElementById('sectionContainer');
+                    if (existingSectionContainer) {
+                        formContainer.removeChild(existingSectionContainer);
+                    }
+                    formContainer.appendChild(sectionContainer);
                 } else {
                     document.getElementById('sectionQtyDiv').style.display = 'none';
-                    formContainer.innerHTML = '';
+
+                    // Remove the section container if it exists
+                    const existingSectionContainer = document.getElementById('sectionContainer');
+                    if (existingSectionContainer) {
+                        formContainer.removeChild(existingSectionContainer);
+                    }
                 }
             } catch (error) {
                 console.error('Error fetching post/project data:', error);
             }
         } else {
-            formContainer.innerHTML = '';
+            // Remove the section container if it exists
+            const existingSectionContainer = document.getElementById('sectionContainer');
+            if (existingSectionContainer) {
+                formContainer.removeChild(existingSectionContainer);
+            }
         }
     });
+});
+
+
     </script>
 </body>
 
