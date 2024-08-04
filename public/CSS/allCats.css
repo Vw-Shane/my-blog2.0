@@ -1,0 +1,7 @@
+
+      
+    .category-row {
+        overflow-x: scroll;
+        white-space: nowrap;
+        margin-bottom: 30px;
+    }
