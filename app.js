@@ -801,6 +801,29 @@ app.get('/pokemon', async (req, res) => {
     }
 });
 
+// Route to handle title search
+app.get('/search', async (req, res) => {
+    const title = req.query.title;
+    let covers = [];
+    if (title) {
+        try {
+            const response = await axios.get(`https://www.googleapis.com/books/v1/volumes`, {
+                params: {
+                    q: `intitle:${title}`,
+                    maxResults: 40  // Adjust this number based on how many results you want
+                }
+            });
+            const books = response.data.items || [];
+            covers = books.flatMap(book =>
+                book.volumeInfo.imageLinks ? [book.volumeInfo.imageLinks.thumbnail] : []
+            );
+        } catch (error) {
+            console.error(error);
+        }
+    }
+    res.render('search', { covers });
+});
+
 
 
 
