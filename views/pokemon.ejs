@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokémon Search</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .pokemon-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 16px;
+            display: inline-block;
+            vertical-align: top;
+            width: 200px;
+        }
+        .pokemon-card img {
+            max-width: 100%;
+            height: auto;
+        }
+        .search-form {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Search for a Pokémon</h1>
+    <form action="/pokemon" method="get" class="search-form">
+        <label for="name">Enter Pokémon name:</label>
+        <input type="text" id="name" name="name" value="<%= search %>" required>
+        <button type="submit">Search</button>
+    </form>
+
+    <% if (cards && cards.length > 0) { %>
+        <h2>Pokémon Cards for "<%= search %>"</h2>
+        <div id="pokemon-container">
+            <% cards.forEach(card => { %>
+                <div class="pokemon-card">
+                    <h2><%= card.name %></h2>
+                    <img src="<%= card.images ? card.images.small : '' %>" alt="<%= card.name %>">
+                    <p>Type: <%= card.types ? card.types.join(', ') : 'N/A' %></p>
+                    <p>Abilities: <%= card.abilities ? card.abilities.map(a => a.name).join(', ') : 'None' %></p>
+                    <p>Legality: Standard - <%= card.legalities ? card.legalities.standard : 'Unknown' %>, Expanded - <%= card.legalities ? card.legalities.expanded : 'Unknown' %></p>
+                    <p>Flavor Text: <%= card.flavorText || 'No flavor text available' %></p>
+                </div>
+            <% }) %>
+        </div>
+    <% } else if (search) { %>
+        <p>No Pokémon found with the name "<%= search %>".</p>
+    <% } %>
+</body>
+</html>
