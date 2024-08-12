@@ -824,6 +824,13 @@ app.get('/search', async (req, res) => {
     res.render('search', { covers });
 });
 
+const storeRoutes = require('./routes/storeRoutes'); // Ensure path is correct
+app.use((req, res, next) => {
+    console.log(`Request URL: ${req.originalUrl}`);
+    next();
+});
+// Use the store routes
+app.use('/store', storeRoutes); // Prefix for store routes
 
 
 

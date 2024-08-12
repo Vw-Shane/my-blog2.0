@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmation</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/CSS/index.css">
+</head>
+
+<body class="text-white">
+  <%- include('../nav') %>
+    <div class="container mt-5">
+        <h1>Thank You for Your Purchase!</h1>
+        <p>Your order has been confirmed. Here are the details:</p>
+        <div class="order-summary">
+            <ul>
+                <% order.items.forEach(item => { %>
+                    <li><%= item.name %> - $<%= item.price.toFixed(2) %> x <%= item.quantity %></li>
+                <% }) %>
+            </ul>
+            <h3>Total: $<%= order.total.toFixed(2) %></h3>
+        </div>
+        <a href="/" class="btn btn-primary">Back to Home</a>
+    </div>
+</body>
+
+</html>

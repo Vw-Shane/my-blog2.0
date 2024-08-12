@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Cart</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .cart-table img {
+            max-width: 80px;
+            height: auto;
+        }
+        .cart-total {
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        @media (max-width: 576px) {
+            .cart-table img {
+                max-width: 50px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <%- include('../nav') %>
+    <div class="container mt-4">
+        <h2>Your Cart</h2>
+        <% if (cart.length === 0) { %>
+            <div class="alert alert-info" role="alert">
+                Your cart is empty. <a href="/store" class="btn btn-primary mt-2">Shop Now</a>
+            </div>
+        <% } else { %>
+            <!-- Form for updating cart quantities -->
+            <form action="/store/update-cart" method="post" id="cart-update-form">
+                <table class="table cart-table">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Total</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% cart.forEach(item => { %>
+                        <tr data-product-id="<%= item.product.id %>">
+                            <td>
+                                <img src="<%= item.product.image %>" alt="<%= item.product.name %>">
+                                <%= item.product.name %>
+                            </td>
+                            <td>
+                                <input type="hidden" name="productId_<%= item.product.id %>" value="<%= item.product.id %>">
+                                <input type="number" name="quantity_<%= item.product.id %>" value="<%= item.quantity %>" min="1" class="form-control d-inline-block" style="width: 70px;">
+                            </td>
+                            <td>$<%= item.product.price.toFixed(2) %></td>
+                            <td>$<%= (item.product.price * item.quantity).toFixed(2) %></td>
+                            <td>
+                                <!-- Remove button with data attribute -->
+                                <button type="button" class="btn btn-danger btn-sm remove-item" data-product-id="<%= item.product.id %>">Remove</button>
+                            </td>
+                        </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+                <div class="d-flex justify-content-between align-items-center mt-4">
+                    <h4 class="cart-total">Total: $
+                        <%= cart.reduce((total, item) => total + (item.product.price * item.quantity), 0).toFixed(2) %>
+                    </h4>
+                    <button type="submit" class="btn btn-secondary">Update Cart</button>
+                    <a href="/store/checkout" class="btn btn-primary">Proceed to Checkout</a>
+                </div>
+            </form>
+        <% } %>
+    </div>
+
+    <!-- Include jQuery first -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- Custom JavaScript for handling remove button clicks -->
+    <script>
+        $(document).ready(function() {
+            $('.remove-item').click(function() {
+                var productId = $(this).data('product-id');
+
+                $.ajax({
+                    url: '/store/remove-from-cart',
+                    method: 'POST',
+                    data: { productId: productId },
+                    success: function(response) {
+                        // Optionally, handle success feedback or reload the page
+                        location.reload(); // Reload the page to update cart
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error removing item from cart:', error);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
