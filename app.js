@@ -185,11 +185,11 @@ app.get('/post/:category_id/:pp_id', async (req, res) => {
                 return res.status(404).json({ error: 'Post not found' });
             }
 
-            // Fetch the photo size for the post
-            const photoSizeQuery = 'SELECT value FROM blog2.photoSize WHERE size_id = $1';
-            const photoSizeValues = [post.photosize_id];
-            const photoSizeResult = await client.query(photoSizeQuery, photoSizeValues);
-            const photoSize = photoSizeResult.rows[0].value;
+            // // Fetch the photo size for the post
+            const photoSizeQuery = null;'SELECT value FROM blog2.photoSize WHERE size_id = $1';
+            const photoSizeValues = null;[post.photosize_id];
+            const photoSizeResult = null;//await client.query(photoSizeQuery, photoSizeValues);
+            const photoSize = null;//photoSizeResult.rows[0].value;
 
             // Fetch the previous post for navigation
             const prevQuery = `
@@ -542,17 +542,29 @@ app.get('/categories/:category_id', async (req, res) => {
 
 app.post('/adminCreate', upload.array('images', 10), async (req, res) => {
     try {
-        const { type, title, content, category, layout, size, sectionQty, sectionTitles, sectionContents, testtf } = req.body;
+        const { type, title, content, category,  sectionQty, sectionTitles, sectionContents, testtf } = req.body;
         const images = req.files ? req.files.map(file => file.path) : [];
 
-
+// Set default values for layout and size if not provided
+        const layout = null;
+        const size = null;
         // Log form values for debugging
         console.log('Form Values:', { type, title, content, category, layout, size, sectionQty, sectionTitles, sectionContents, testtf });
 
-        // Ensure all required fields are present
-        if (!title || !content || !category || !layout || !size) {
-            throw new Error('Missing required fields');
-        }
+       // Ensure all required fields are present
+const missingFields = [];
+
+if (!title) missingFields.push("title");
+if (!content) missingFields.push("content");
+if (!category) missingFields.push("category");
+// if (!layout) missingFields.push("layout");
+// if (!size) missingFields.push("size");
+
+if (missingFields.length > 0) {
+    console.log("Missing required fields:", missingFields.join(", "));
+    throw new Error("Please fill in all required fields.");
+}
+
 
         if (type === 'post') {
             const postQuery = `
