@@ -1,4 +1,3 @@
-
 const express = require('express');
 const app = express();
 const session = require('express-session');
@@ -831,7 +830,13 @@ app.use((req, res, next) => {
 // Use the store routes
 app.use('/store', storeRoutes); // Prefix for store routes
 
+app.post('/uploadImage', upload.single('file'), (req, res) => {
+    // Handle the uploaded file here
+    // For simplicity, we'll just return the file path
+    res.json({ location: `/uploads/${req.file.filename}` });
+});
 
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
