@@ -152,11 +152,12 @@
     });
 
     document.addEventListener('DOMContentLoaded', function() {
+        // Initialize TinyMCE
         tinymce.init({
             selector: '#postContent',
             plugins: 'image code',
             toolbar: 'undo redo | link image | code',
-            images_upload_url: '/uploadImage', // Your server-side upload handler
+            images_upload_url: '/uploadImage', // Your existing server-side upload handler
             automatic_uploads: true,
             images_upload_handler: function (blobInfo, success, failure) {
                 let xhr, formData;
@@ -180,6 +181,16 @@
                 formData.append('file', blobInfo.blob(), blobInfo.filename());
                 xhr.send(formData);
             }
+        });
+
+        // Your existing JavaScript code for handling form submissions, etc.
+        const form = document.querySelector('form');
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+            // Handle form submission logic here
+            const content = tinymce.get('postContent').getContent();
+            console.log('Form submitted with content:', content);
+            // You can send the content to your server here
         });
     });
     </script>
