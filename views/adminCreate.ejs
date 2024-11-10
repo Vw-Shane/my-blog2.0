@@ -13,7 +13,7 @@
 <body class="bg-dark text-white">
     <div class="container mt-5">
         <h1 class="text-center">Create New Post/Project</h1>
-        <form id="creationForm" action="/adminCreate" method="POST" enctype="multipart/form-data">
+        <form id="creationForm" action="/adminCreate" method="POST" enctype="application/x-www-form-urlencoded">
             <div class="form-group">
                 <label for="type">Type</label>
                 <select class="form-control" id="type" name="type" required>
@@ -21,24 +21,12 @@
                     <!-- <option value="project">Project</option> -->
                 </select>
             </div>
-            <!-- <div class="form-group" id="sectionQtyDiv" style="display: none;">
-                <label for="sectionQty">Number of Sections</label>
-                <select class="form-control" id="sectionQty" name="sectionQty">
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                </select>
-            </div> -->
+        
             <div class="form-group">
                 <label for="title">Title</label>
                 <input type="text" class="form-control" id="title" name="title" required>
             </div>
-            <!-- <div class="form-group">
-                <label for="content">Content</label>
-                <textarea class="form-control" id="content" name="content" rows="5" required></textarea>
-            </div> -->
+     
             <div class="form-group" style="color: black;">
                 <label style="color: White;"for="content">Body</label>
                 <textarea class="form-control" id="content" name="content" rows="10" required></textarea>
@@ -53,45 +41,6 @@
                     <% }); %>
                 </select>
             </div>
-            <!-- <div class="form-group">
-                <label for="layout">Layout</label>
-                <select class="form-control" id="layout" name="layout" required>
-                    <% layoutOptions.forEach(layout => { %>
-                    <option value="<%= layout.placement_id %>">
-                        <%= layout.value %>
-                    </option>
-                    <% }); %>
-                </select>
-            </div> -->
-            <!-- <div class="form-group">
-                <label for="size">Image Size</label>
-                <select class="form-control" id="size" name="size" required>
-                    <% sizeOptions.forEach(size => { %>
-                    <option value="<%= size.size_id %>">
-                        <%= size.value %>
-                    </option>
-                    <% }); %>
-                </select>
-            </div> -->
-            <!-- <div class="form-group">
-                <label for="mediaType">Media Type</label>
-                <select class="form-control" id="mediaType" name="mediaType" required>
-                    <option value="image">Upload Image</option>
-                    <option value="video">Embed Video</option>
-                </select>
-            </div> -->
-            <!-- <div id="imageUploadDiv">
-                <div class="form-group">
-                    <label for="images">Images</label>
-                    <input type="file" class="form-control-file" id="images" name="images" multiple>
-                </div>
-            </div>
-            <div id="videoEmbedDiv" style="display: none;">
-                <div class="form-group">
-                    <label for="videoUrl">YouTube URL</label>
-                    <input type="text" class="form-control" id="videoUrl" name="videoUrl">
-                </div>
-            </div> -->
             <div class="form-group">
                 <label for="selectState">Test T/F</label>
                 <select id="testtf" name="testtf" required>
@@ -104,96 +53,59 @@
         </form>
         <h2 class="mt-5">Preview</h2>
         <div id="preview"></div>
+
     </div>
      <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.18/summernote-bs4.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            $('#content').summernote({
-                height: 300,
-                callbacks: {
-                    onImageUpload: function(files) {
-                        const data = new FormData();
-                        data.append('image', files[0]);
-                        $.ajax({
-                            url: '/upload_image',
-                            method: 'POST',
-                            data: data,
-                            processData: false,
-                            contentType: false,
-                            success: function(response) {
-                                $('#content').summernote('insertImage', response.url);
-                            },
-                            error: function(jqXHR, textStatus, errorThrown) {
-                                console.error(textStatus, errorThrown);
-                            }
-                        });
-                    }
+   <script>
+    $(document).ready(function() {
+        // Initialize Summernote editor
+        $('#content').summernote({
+            height: 300,
+            callbacks: {
+                // Handle image uploads
+                onImageUpload: function(files) {
+                    const data = new FormData();
+                    data.append('image', files[0]);
+
+                    $.ajax({
+                        url: '/upload_image',
+                        method: 'POST',
+                        data: data,
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            // Insert image URL into Summernote
+                            $('#content').summernote('insertImage', response.url);
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            console.error(textStatus, errorThrown);
+                        }
+                    });
                 }
-            });
-
-            $('#title').on('input', function() {
-                const title = $('#title').val();
-                const body = $('#content').val();
-                $('#preview').html('<h2>' + title + '</h2>' + body);
-            });
-
-            $('#body').on('summernote.change', function(we, contents, $editable) {
-                const title = $('#title').val();
-                const body = contents;
-                $('#preview').html('<h2>' + title + '</h2>' + body);
-            });
+            }
         });
-    </script>
-    <script>
-    document.getElementById('type').addEventListener('change', function() {
-        const type = this.value;
-        const sectionQtyDiv = document.getElementById('sectionQtyDiv');
-        const sectionsContainer = document.getElementById('sectionsContainer');
-        sectionsContainer.innerHTML = '';
-        sectionQtyDiv.style.display = 'none';
-       
-    });
 
-    // document.getElementById('sectionQty').addEventListener('change', function() {
-    //     const sectionQty = this.value;
-    //     const sectionsContainer = document.getElementById('sectionsContainer');
-    //     sectionsContainer.innerHTML = '';
+        // Update preview when title or content changes
+        $('#title').on('input', function() {
+            updatePreview();
+        });
 
-    //     for (let i = 0; i < sectionQty; i++) {
-    //         sectionsContainer.innerHTML += ` 
-    //                 <h3>Section ${i + 1}</h3>
-    //                 <div class="form-group">
-    //                     <label for="sectionTitle${i}">Section Title</label>
-    //                     <input type="text" class="form-control" id="sectionTitle${i}" name="sectionTitles[]" required>
-    //                 </div>
-    //                 <div class="form-group">
-    //                     <label for="sectionContent${i}">Section Content</label>
-    //                     <textarea class="form-control" id="sectionContent${i}" name="sectionContents[]" rows="5" required></textarea>
-    //                 </div>
-    //                 <div class="form-group">
-    //                     <label for="sectionImages${i}">Section Images</label>
-    //                     <input type="file" class="form-control-file" id="sectionImages${i}" name="sectionImages${i}[]" multiple>
-    //                 </div>
-    //             `;
-    //     }
-    // });
+        $('#content').on('summernote.change', function(we, contents, $editable) {
+            updatePreview();
+        });
 
-    document.getElementById('mediaType').addEventListener('change', function() {
-        const mediaType = this.value;
-        const imageUploadDiv = document.getElementById('imageUploadDiv');
-        const videoEmbedDiv = document.getElementById('videoEmbedDiv');
-
-        if (mediaType === 'video') {
-            imageUploadDiv.style.display = 'none';
-            videoEmbedDiv.style.display = 'block';
-        } else {
-            imageUploadDiv.style.display = 'block';
-            videoEmbedDiv.style.display = 'none';
+        // Update the preview pane with current title and content
+        function updatePreview() {
+            const title = $('#title').val();
+            const body = $('#content').summernote('code'); // Get the content from Summernote
+            $('#preview').html('<h2>' + title + '</h2>' + body);
         }
     });
-    </script>
+</script>
+
+    
 </body>
 
 </html>

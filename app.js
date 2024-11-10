@@ -57,7 +57,9 @@ app.use(session({
     saveUninitialized: true,
 }));
 
-app.use(bodyParser.urlencoded({ extended: true }));
+//app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true }));
+
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -433,6 +435,21 @@ app.post('/admin/edit', upload.array('images', 10), async (req, res) => {
     }
 });
 
+app.post('/upload_image', upload.single('image'), (req, res) => {
+    if (req.file) {
+        // Send back the URL to the client
+        res.json({ url: req.file.path });
+    } else {
+        res.status(400).json({ error: 'Failed to upload image' });
+    }
+});
+
+
+
+
+
+
+
 
 app.get('/login', (req, res) => {
     res.render('login', { error: null });
@@ -540,31 +557,29 @@ app.get('/categories/:category_id', async (req, res) => {
 
 
 
-app.post('/adminCreate', upload.array('images', 10), async (req, res) => {
+app.post('/adminCreate', async (req, res) => {
     try {
-        const { type, title, content, category,  sectionQty, sectionTitles, sectionContents, testtf } = req.body;
-        const images = req.files ? req.files.map(file => file.path) : [];
+        const { type, title, content, category, testtf } = req.body;
+        console.log('Form Values:', { type, title, content, category, testtf });
 
-// Set default values for layout and size if not provided
+        // No need to handle the images here; Summernote will already provide URLs for the images in the `content` field.
+        const images = [];  // No longer handling images with Multer
+
+        // Set default values for layout and size if not provided
         const layout = null;
         const size = null;
-        // Log form values for debugging
-        console.log('Form Values:', { type, title, content, category, layout, size, sectionQty, sectionTitles, sectionContents, testtf });
 
-       // Ensure all required fields are present
-const missingFields = [];
+        // Ensure all required fields are present
+        const missingFields = [];
 
-if (!title) missingFields.push("title");
-if (!content) missingFields.push("content");
-if (!category) missingFields.push("category");
-// if (!layout) missingFields.push("layout");
-// if (!size) missingFields.push("size");
+        if (!title) missingFields.push("title");
+        if (!content) missingFields.push("content");
+        if (!category) missingFields.push("category");
 
-if (missingFields.length > 0) {
-    console.log("Missing required fields:", missingFields.join(", "));
-    throw new Error("Please fill in all required fields.");
-}
-
+        if (missingFields.length > 0) {
+            console.log("Missing required fields:", missingFields.join(", "));
+            throw new Error("Please fill in all required fields.");
+        }
 
         if (type === 'post') {
             const postQuery = `
@@ -572,7 +587,7 @@ if (missingFields.length > 0) {
                 VALUES ($1, $2, $3, $4, $5, $6, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NULL, $7)
                 RETURNING post_id
             `;
-            const postValues = [category, title, content, layout, size, images[0], testtf];
+            const postValues = [category, title, content, layout, size, images[0] || null, testtf];
             const postResult = await client.query(postQuery, postValues);
 
             const postId = postResult.rows[0].post_id;
@@ -585,7 +600,6 @@ if (missingFields.length > 0) {
             const ppValues = [postId, category, testtf];
             await client.query(ppQuery, ppValues);
 
-            // Log the result for debugging
             console.log('Post created:', postResult.rows[0]);
         } else if (type === 'project') {
             const projectQuery = `
@@ -606,29 +620,17 @@ if (missingFields.length > 0) {
             const ppValues = [projectId, category, testtf];
             await client.query(ppQuery, ppValues);
 
-            // Log the result for debugging
             console.log('Project created:', projectResult.rows[0]);
-
-            for (let i = 0; i < sectionQty; i++) {
-                const sectionQuery = `
-                    INSERT INTO blog2.projectsection (project_id, category_id, subheader, content,  photo_link, viewcount, createdate, modifieddate)
-                    VALUES ($1, $2, $3, $4, $5, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-                `;
-                const sectionValues = [projectId, category, sectionTitles[i], sectionContents[i], images[i + 1] || null];
-                await client.query(sectionQuery, sectionValues);
-            }
-
-            // Log the sections for debugging
-            console.log('Project sections created');
         }
 
         res.redirect('/');
-     } catch (err) {
+    } catch (err) {
         console.error('Error creating post or project:', err.message);
         console.error('Stack Trace:', err.stack);
         res.status(500).json({ error: 'Database error' });
     }
 });
+
 
 // Route to render subscription page
 app.get('/subscribe', (req, res) => {
@@ -842,11 +844,26 @@ app.use((req, res, next) => {
 // Use the store routes
 app.use('/store', storeRoutes); // Prefix for store routes
 
-app.post('/uploadImage', upload.single('file'), (req, res) => {
-    // Handle the uploaded file here
-    // For simplicity, we'll just return the file path
-    res.json({ location: `/uploads/${req.file.filename}` });
+// app.post('/upload_Image', upload.single('image'), (req, res) => {
+//     // Handle the uploaded file here
+//     // For simplicity, we'll just return the file path
+//     res.json({ location: `/uploads/${req.file.filename}` });
+// });
+app.post('/upload_image', upload.single('image'), async (req, res) => {
+    if (req.file) {
+        try {
+            const result = await cloudinary.uploader.upload(req.file.path);
+            res.json({ url: result.secure_url }); // Send Cloudinary URL back
+        } catch (error) {
+            res.status(500).json({ error: 'Failed to upload image to Cloudinary' });
+        }
+    } else {
+        res.status(400).json({ error: 'Failed to upload image' });
+    }
 });
+
+
+
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
