@@ -37,7 +37,7 @@ const storage = new CloudinaryStorage({
         folder: 'blog_images',
         format: async (req, file) => 'png',
         public_id: (req, file) => file.originalname,
-      //  transformation: [{ width: 400, height: 400, crop: 'limit' }]
+        //  transformation: [{ width: 400, height: 400, crop: 'limit' }]
     },
 });
 
@@ -91,10 +91,10 @@ function isAuthenticated(req, res, next) {
 
 app.get('/', async (req, res) => {
     try {
-        
+
         const categoriesResult = await client.query('SELECT * FROM blog2.categories ORDER BY id');
         const categories = categoriesResult.rows;
-const isLocalhost = req.get('host') === 'localhost:3000';
+        const isLocalhost = req.get('host') === 'localhost:3000';
         const ppResult = await client.query(`
             SELECT pp.*,
               coalesce(pjt.title,pst.title) as title,
@@ -107,15 +107,15 @@ const isLocalhost = req.get('host') === 'localhost:3000';
             left join blog2.project pjt on pp.project_id=pjt.project_id and c.id=pjt.category_id
             ORDER BY pp.pp_id DESC
          `);
-    
+
         const ppEntries = ppResult.rows;
 
         // Create a set of category IDs that have associated entries in `pp`
         // const populatedCategoryIds = new Set(ppEntries.map(entry => entry.category_id));
         const populatedCategoryIds = new Set(
             ppEntries
-                .filter(entry => isLocalhost || !entry.localhosttf)  // Filter based on localhosttf
-                .map(entry => entry.category_id)
+            .filter(entry => isLocalhost || !entry.localhosttf) // Filter based on localhosttf
+            .map(entry => entry.category_id)
         );
         // Filter categories to include only those with populated entries
         const filteredCategories = categories.filter(category => populatedCategoryIds.has(category.id));
@@ -142,7 +142,7 @@ const isLocalhost = req.get('host') === 'localhost:3000';
         });
 
         res.render('index', { entries: recentEntries, categories: filteredCategories });
-    } catch (err) {        
+    } catch (err) {
         console.error('Error executing query', err);
         res.status(500).json({ error: 'Database error' });
     }
@@ -188,10 +188,12 @@ app.get('/post/:category_id/:pp_id', async (req, res) => {
             }
 
             // // Fetch the photo size for the post
-            const photoSizeQuery = null;'SELECT value FROM blog2.photoSize WHERE size_id = $1';
-            const photoSizeValues = null;[post.photosize_id];
-            const photoSizeResult = null;//await client.query(photoSizeQuery, photoSizeValues);
-            const photoSize = null;//photoSizeResult.rows[0].value;
+            const photoSizeQuery = null;
+            'SELECT value FROM blog2.photoSize WHERE size_id = $1';
+            const photoSizeValues = null;
+            [post.photosize_id];
+            const photoSizeResult = null; //await client.query(photoSizeQuery, photoSizeValues);
+            const photoSize = null; //photoSizeResult.rows[0].value;
 
             // Fetch the previous post for navigation
             const prevQuery = `
@@ -401,8 +403,7 @@ app.post('/admin/edit', upload.array('images', 10), async (req, res) => {
 
             // Log the result for debugging
             console.log('Post updated:', postId);
-        }
- else if (type === 'project') {
+        } else if (type === 'project') {
             const updateProjectQuery = `
                 UPDATE blog2.project
                 SET title = $1, category_id = $2, sectionqty = $3, modifieddate = CURRENT_TIMESTAMP, testtf = $4
@@ -493,7 +494,7 @@ const getEntriesByCategory = async (categoryId, isLocalhost) => {
         AND ($2 OR pp.localHostTF != true)  -- Check for localhost or localhostTF = 0
         ORDER BY pp.pp_id DESC
     `;
-   
+
     const values = [categoryId, isLocalhost];
     const result = await client.query(query, values);
     return result.rows;
@@ -502,13 +503,13 @@ const getEntriesByCategory = async (categoryId, isLocalhost) => {
 
 app.get('/categories', async (req, res) => {
     try {
-const isLocalhost = req.get('host') === 'localhost:3000';
+        const isLocalhost = req.get('host') === 'localhost:3000';
         const categories = await getAllCategories(); // Fetch all categories
 
         const entries = {};
 
         for (const category of categories) {
-    
+
             // Fetch all entries for each category with the localhost condition
             const categoryEntries = await getEntriesByCategory(category.id, isLocalhost);
 
@@ -538,7 +539,7 @@ app.get('/categories/:category_id', async (req, res) => {
         // Fetch the category based on category_id
         const category = await getTheCategory(category_id);
 
-     
+
         const entries = {};
 
         // Fetch all entries for the current category with the localhost condition
@@ -563,7 +564,7 @@ app.post('/adminCreate', async (req, res) => {
         console.log('Form Values:', { type, title, content, category, testtf });
 
         // No need to handle the images here; Summernote will already provide URLs for the images in the `content` field.
-        const images = [];  // No longer handling images with Multer
+        const images = []; // No longer handling images with Multer
 
         // Set default values for layout and size if not provided
         const layout = null;
@@ -637,18 +638,18 @@ app.get('/subscribe', (req, res) => {
     const frequenciesQuery = 'SELECT freq_id, name AS frequencyName FROM blog2.frequencies';
 
     // Fetch frequencies and render the page
-client.query(frequenciesQuery)
-    .then(frequenciesResult => {
-        console.log(frequenciesResult.rows); // Log data for debugging
-        res.render('subscribe', {
-            categories: res.locals.categories, // Use categories from res.locals
-            frequencies: frequenciesResult.rows // Frequencies fetched from the database
+    client.query(frequenciesQuery)
+        .then(frequenciesResult => {
+            console.log(frequenciesResult.rows); // Log data for debugging
+            res.render('subscribe', {
+                categories: res.locals.categories, // Use categories from res.locals
+                frequencies: frequenciesResult.rows // Frequencies fetched from the database
+            });
+        })
+        .catch(err => {
+            console.error('Error rendering subscription page:', err);
+            res.status(500).send('An error occurred while fetching data.');
         });
-    })
-    .catch(err => {
-        console.error('Error rendering subscription page:', err);
-        res.status(500).send('An error occurred while fetching data.');
-    });
 
 
 });
@@ -689,7 +690,7 @@ app.post('/subscribe', (req, res) => {
                 ON CONFLICT (subscriber_id) DO UPDATE
                 SET frequency_id = EXCLUDED.frequency_id,
                     ${categoryUpdates}`;
-            
+
             // Prepare values for the query
             const categoryValues = normalizedCategoryColumns.map(column => normalizedCategories.includes(column) ? true : false);
 
@@ -714,7 +715,7 @@ app.get('/admin/top-posts', async (req, res) => {
             ORDER BY viewcount DESC
             LIMIT 10
         `;
-        
+
         const result = await client.query(query);
         const topPosts = result.rows;
 
@@ -822,7 +823,7 @@ app.get('/search', async (req, res) => {
             const response = await axios.get(`https://www.googleapis.com/books/v1/volumes`, {
                 params: {
                     q: `intitle:${title}`,
-                    maxResults: 40  // Adjust this number based on how many results you want
+                    maxResults: 40 // Adjust this number based on how many results you want
                 }
             });
             const books = response.data.items || [];
@@ -863,11 +864,22 @@ app.post('/upload_image', upload.single('image'), async (req, res) => {
 });
 
 
-
+app.get('/testArea', async (req, res) => {
+            try {   res.render('testArea', {});
+    } catch (err) {
+        console.error('Error executing query', err);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
+
+
+
+
+    
 });
