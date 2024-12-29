@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coming Soon | Q1 2025</title>
+  <!-- Modern styling -->
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(to bottom right, #ff7eb3, #ff758c);
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      text-align: center;
+    }
+
+    .container {
+      background: #ffffff;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      max-width: 600px;
+      width: 90%;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      color: #ff4f73;
+    }
+
+    p {
+      margin: 1rem 0;
+      font-size: 1.1rem;
+      color: #555;
+    }
+
+    form {
+      margin: 1.5rem 0;
+    }
+
+    input[type="email"] {
+      width: 80%;
+      padding: 0.8rem;
+      margin-right: 0.5rem;
+      border: 2px solid #ff758c;
+      border-radius: 5px;
+      outline: none;
+    }
+
+    button {
+      padding: 0.8rem 1.2rem;
+      background-color: #ff4f73;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background-color: #ff6f91;
+    }
+
+    .success {
+      color: green;
+      margin-top: 1rem;
+    }
+
+    .footer {
+      margin-top: 2rem;
+      font-size: 0.9rem;
+      color: #777;
+    }
+
+    @media (max-width: 600px) {
+      input[type="email"] {
+        width: 100%;
+        margin: 0.5rem 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>We Are Launching Soon 🚀</h1>
+    <p>Our business is set to open in <strong>Q1 2025</strong>. Stay updated!</p>
+    <p>Drop your email below to be the first to know about our launch.</p>
+
+    <!-- Email form -->
+    <form action="/submit-email" method="POST">
+      <input type="email" name="email" placeholder="Your Email Address" required>
+      <button type="submit">Notify Me</button>
+    </form>
+
+    <!-- Success and Error messages -->
+    <% if (success) { %>
+      <p class="success">Thank you for subscribing! 🎉</p>
+    <% } %>
+    <% if (error) { %>
+      <p class="error" style="color: red;"><%= error %></p>
+    <% } %>
+  </div>
+
+  <div class="footer">
+    &copy; <%= new Date().getFullYear() %> Your Business Name. All rights reserved.
+  </div>
+</body>
+</html>
+
+

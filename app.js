@@ -3,6 +3,7 @@ const app = express();
 const session = require('express-session');
 const bodyParser = require('body-parser');
 const path = require('path');
+const nodemailer = require('nodemailer');
 const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
@@ -23,6 +24,15 @@ const client = new Client({
     ssl: {
         rejectUnauthorized: false
     }
+});
+const transporter = nodemailer.createTransport({
+  host: 'mail.hover.com', // Hover SMTP server
+  port: 587,              // Use port 587 for STARTTLS
+  secure: false,          // False for STARTTLS; true for SSL port 465
+  auth: {
+    user: process.env.EMAIL_USER, // Your Hover email
+    pass: process.env.EMAIL_PASS, // Your Hover password
+  },
 });
 
 cloudinary.config({
@@ -89,7 +99,14 @@ function isAuthenticated(req, res, next) {
     res.redirect('/login');
 }
 
-app.get('/', async (req, res) => {
+// Serve the landing page
+app.get('/', (req, res) => {
+  res.render('landing', { success: false, error: false });
+});
+
+
+
+app.get('/landing', async (req, res) => {
     try {
 
         const categoriesResult = await client.query('SELECT * FROM blog2.categories ORDER BY id');
@@ -879,7 +896,32 @@ app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 
 
+// Route to handle email submissions
+app.post('/submit-email', (req, res) => {
+  const { email } = req.body;
 
+  if (!email || !email.includes('@')) {
+    return res.render('landing', { success: false, error: 'Invalid email address' });
+  }
+
+  // Email options
+  const mailOptions = {
+    from: process.env.EMAIL_USER, // Sender email (your Hover email)
+    to: 'contact@eastcoasthobbyventures.com', // Your receiving email
+    subject: 'New Interested User Submission',
+    text: `You have a new email subscriber: ${email}`,
+  };
+
+  // Send email
+  transporter.sendMail(mailOptions, (err, info) => {
+    if (err) {
+      console.error(err);
+      return res.render('landing', { success: false, error: 'Failed to send email. Please try again.' });
+    }
+    console.log('Email sent:', info.response);
+    res.render('landing', { success: true, error: false });
+  });
+});
 
     
 });
