@@ -106,7 +106,7 @@ app.get('/', (req, res) => {
 
 
 
-app.get('/landing', async (req, res) => {
+app.get('/landing',isAuthenticated, async (req, res) => {
     try {
 
         const categoriesResult = await client.query('SELECT * FROM blog2.categories ORDER BY id');
@@ -164,8 +164,8 @@ app.get('/landing', async (req, res) => {
         res.status(500).json({ error: 'Database error' });
     }
 });
-
-app.get('/post/:category_id/:pp_id', async (req, res) => {
+//isAuthenticated
+app.get('/post/:category_id/:pp_id',isAuthenticated, async (req, res) => {
     try {
         const { category_id, pp_id } = req.params;
         const isLocalHost = req.hostname === 'localhost';
@@ -517,8 +517,8 @@ const getEntriesByCategory = async (categoryId, isLocalhost) => {
     return result.rows;
 };
 
-
-app.get('/categories', async (req, res) => {
+// isAuthenticated
+app.get('/categories',isAuthenticated, async (req, res) => {
     try {
         const isLocalhost = req.get('host') === 'localhost:3000';
         const categories = await getAllCategories(); // Fetch all categories
@@ -543,8 +543,8 @@ app.get('/categories', async (req, res) => {
     }
 });
 
-
-app.get('/categories/:category_id', async (req, res) => {
+//isAuthenticated
+app.get('/categories/:category_id',isAuthenticated, async (req, res) => {
     try {
         const isLocalhost = req.get('host') === 'localhost:3000';
         const { category_id } = req.params;
@@ -649,9 +649,9 @@ app.post('/adminCreate', async (req, res) => {
     }
 });
 
-
+//isAuthenticated
 // Route to render subscription page
-app.get('/subscribe', (req, res) => {
+app.get('/subscribe',isAuthenticated, (req, res) => {
     const frequenciesQuery = 'SELECT freq_id, name AS frequencyName FROM blog2.frequencies';
 
     // Fetch frequencies and render the page
@@ -722,8 +722,8 @@ app.post('/subscribe', (req, res) => {
             res.status(500).send('An error occurred while processing your subscription.');
         });
 });
-
-app.get('/admin/top-posts', async (req, res) => {
+// isAuthenticated
+app.get('/admin/top-posts',isAuthenticated, async (req, res) => {
     try {
         // Query to get the top 10 posts with view counts greater than 1, ordered by view count descending
         const query = `
@@ -830,9 +830,9 @@ app.get('/pokemon', async (req, res) => {
         res.status(500).send('Error fetching Pokémon cards.');
     }
 });
-
+//isAuthenticated
 // Route to handle title search
-app.get('/search', async (req, res) => {
+app.get('/search',isAuthenticated, async (req, res) => {
     const title = req.query.title;
     let covers = [];
     if (title) {
@@ -880,8 +880,8 @@ app.post('/upload_image', upload.single('image'), async (req, res) => {
     }
 });
 
-
-app.get('/testArea', async (req, res) => {
+// isAuthenticated maybe jsut delete this?
+app.get('/testArea',isAuthenticated, async (req, res) => {
             try {   res.render('testArea', {});
     } catch (err) {
         console.error('Error executing query', err);
