@@ -29,7 +29,7 @@
       padding: 2rem;
       border-radius: 10px;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      max-width: 600px;
+      max-width: 800px;
       width: 90%;
     }
 
@@ -78,9 +78,17 @@
     }
 
     .footer {
+
+  position: fixed;
       margin-top: 2rem;
       font-size: 0.9rem;
       color: #777;
+
+  left: 0;
+  bottom: 0;
+  width: 100%;
+
+  text-align: center;
     }
 
     @media (max-width: 600px) {
@@ -94,8 +102,8 @@
 <body>
   <div class="container">
     <h1>We Are Launching Soon 🚀</h1>
-    <p>Our business is set to open in <strong>Q1 2025</strong>. Stay updated!</p>
-    <p>Drop your email below to be the first to know about our launch.</p>
+    <p>East Coast Hobby Ventures is set begin operating <strong>Q1 2025!</strong> </p>
+    <p>Drop your email below to stay up to date on everything we have in store.</p>
 
     <!-- Email form -->
     <form action="/submit-email" method="POST">
@@ -105,7 +113,7 @@
 
     <!-- Success and Error messages -->
     <% if (success) { %>
-      <p class="success">Thank you for subscribing! 🎉</p>
+      <p class="success">Thank you so much for subscribing! 🎉</p>
     <% } %>
     <% if (error) { %>
       <p class="error" style="color: red;"><%= error %></p>
@@ -113,7 +121,7 @@
   </div>
 
   <div class="footer">
-    &copy; <%= new Date().getFullYear() %> Your Business Name. All rights reserved.
+    &copy; <%= new Date().getFullYear() %> East Coast Hobby Ventures LLC. All rights reserved.
   </div>
 </body>
 </html>
