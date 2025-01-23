@@ -889,6 +889,11 @@ app.get('/testArea',isAuthenticated, async (req, res) => {
     }
 });
 
+// isAuthenticated maybe jsut delete this?
+app.get('/contact', async (req, res) =>  
+    { res.render('contact', { success: false, error: false });
+});
+
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 const PORT = process.env.PORT || 3000;
@@ -896,30 +901,67 @@ app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 
 
-// Route to handle email submissions
+// // Route to handle email submissions
+// app.post('/submit-email', (req, res) => {
+//   const { email } = req.body;
+
+//   if (!email || !email.includes('@')) {
+//     return res.render('landing', { success: false, error: 'Invalid email address' });
+//   }
+
+//   // Email options
+//   const mailOptions = {
+//     from: process.env.EMAIL_USER, // Sender email (your Hover email)
+//     to: 'contact@eastcoasthobbyventures.com', // Your receiving email
+//     subject: 'New Interested User Submission',
+//     text: `You have a new email subscriber: ${email}`,
+//   };
+
+//   // Send email
+//   transporter.sendMail(mailOptions, (err, info) => {
+//     if (err) {
+//       console.error(err);
+//       return res.render('landing', { success: false, error: 'Failed to send email. Please try again.' });
+//     }
+//     console.log('Email sent:', info.response);
+//     res.render('landing', { success: true, error: false });
+//   });
+// });
 app.post('/submit-email', (req, res) => {
-  const { email } = req.body;
+  const { name, email, details, source } = req.body;
 
-  if (!email || !email.includes('@')) {
+  // Default to 'contact' if no source is provided
+  const sourcePage = source || 'contact';
+
+  // Validate the required fields
+  if (sourcePage==='contact') {
+  if (!email || !email.includes('@') || !name) {
+    return res.render(sourcePage, { success: false, error: 'Please provide a valid name and email address.' });
+  }else 
+    if (!email || !email.includes('@')) {
     return res.render('landing', { success: false, error: 'Invalid email address' });
-  }
+  }};
+  
 
-  // Email options
+  // Compose the email content
   const mailOptions = {
-    from: process.env.EMAIL_USER, // Sender email (your Hover email)
-    to: 'contact@eastcoasthobbyventures.com', // Your receiving email
-    subject: 'New Interested User Submission',
-    text: `You have a new email subscriber: ${email}`,
+    from: process.env.EMAIL_USER,
+    to: 'contact@eastcoasthobbyventures.com',
+    subject: 'New User Submission',
+    text: `You have a new submission:
+- Name: ${name}
+- Email: ${email}
+- Additional Details: ${details || 'N/A'}`
   };
 
-  // Send email
+  // Send the email
   transporter.sendMail(mailOptions, (err, info) => {
     if (err) {
       console.error(err);
-      return res.render('landing', { success: false, error: 'Failed to send email. Please try again.' });
+      return res.render(sourcePage, { success: false, error: 'Failed to send email. Please try again.' });
     }
     console.log('Email sent:', info.response);
-    res.render('landing', { success: true, error: false });
+    res.render(sourcePage, { success: true, error: false });
   });
 });
 

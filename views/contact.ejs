@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coming Soon | Q1 2025</title>
+    <!-- Modern styling -->
+    <style>
+        * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(to bottom right, #ff7eb3, #ff758c);
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      text-align: center;
+        padding-bottom: 4rem; 
+        padding-top: 1rem; 
+    }
+
+
+    .container {
+      background: #ffffff;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      max-width: 800px;
+      width: 90%;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      color: #ff4f73;
+    }
+    h2{
+      color: #ff4f74;
+    }
+
+    p {
+      margin: 1rem 0;
+      font-size: 1.1rem;
+      color: #555;
+    }
+
+    form {
+      margin: 1.5rem 0;
+    }
+
+ input[type="email"],
+input[type="text"],
+textarea[name="details"]{
+      width: 80%;
+      padding: 0.8rem;
+      margin-right: 0.5rem;
+      border: 2px solid #ff758c;
+      border-radius: 5px;
+      outline: none;
+    }
+li{text-align: left;}
+
+    button {
+      padding: 0.8rem 1.2rem;
+      background-color: #ff4f73;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background-color: #ff6f91;
+    }
+
+    .success {
+      color: green;
+      margin-top: 1rem;
+    }
+
+/* Footer styling */
+.footer {
+  position: fixed;
+  margin-top: 2rem;
+  font-size: 0.9rem;
+  color: #777;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  text-align: center;
+  background-color: #fff; /* Optional: Add a background color */
+  z-index: 10; /* Ensures footer stays above other content */
+}
+
+/* Add padding to the page content */
+
+
+
+    @media (max-width: 600px) {
+      input[type="email"] {
+        width: 100%;
+        margin: 0.5rem 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Thank you so much for your interest!</h1>
+        <p>A little about myself and the project.</p>
+        <p> I'm Shane, I've been working on this board game in my free time for a few years.</p>
+        <p>In the last few months I've begun to take it more seriously and am ready to order prototypes. My current goal is to do an initial release on a crowdfunding website in April.</p>
+        <H2>So where do you come in?</H2>
+        <p> While I have spent numerous hours working on the game's concept and core mechanics. I don’t have a specific art style for the game.</p>
+        <ul>I’m looking for someone who can
+            <li>take my ideas and concepts (and terrible drawings) and turn them into cohesive assets for the board game.</li>
+            <li>provide advisement and take criticism/feedback well.</li>
+            <li>find other artists who can help where there may be gaps in your skillset. </li>
+        </ul>
+        <p>If this game is successful, this could be full time position. </p>
+        <p>As far as compensation, I am self-funding this project. Therefore, while I can pay you for your time, the majority of your earnings would be a based on a profit split once the game goes to market. </p>
+        <p>If you are intrested in working on this project, or would like additnal information. Please fill out the below form.</p><p> No Spam I promise. </p>
+        <p>Feel free to add a link to your work</p>
+        <!-- Email form -->
+        <form action="/submit-email" method="POST">
+          <input type="hidden" name="source" value="contact">
+            <input type="text" name="name" placeholder="Your Name" required>
+            <input type="email" name="email" placeholder="Your Email Address" required>
+            <p>Feel free to add a link to your work below</p>
+            <textarea name="details" placeholder="Additional Details (optional)" rows="4"></textarea>
+            <br>
+            <button type="submit">Submit</button>
+        </form>
+        <!-- Success and Error messages -->
+        <% if (success) { %>
+        <p class="success">Thank you so much I will follow up with you soon! 🎉</p>
+        <% } %>
+        <% if (error) { %>
+        <p class="error" style="color: red;">
+            <%= error %>
+        </p>
+        <% } %>
+    </div>
+    <div class="footer">
+        &copy;
+        <%= new Date().getFullYear() %> East Coast Hobby Ventures LLC. All rights reserved.
+    </div>
+</body>
+
+</html>

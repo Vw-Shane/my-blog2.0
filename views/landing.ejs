@@ -107,6 +107,7 @@
 
     <!-- Email form -->
     <form action="/submit-email" method="POST">
+      <input type="hidden" name="source" value="landing">
       <input type="email" name="email" placeholder="Your Email Address" required>
       <button type="submit">Notify Me</button>
     </form>
