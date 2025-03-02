@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Coming Soon | Q1 2025</title>
-  <!-- Modern styling -->
-  <style>
-    * {
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coming Soon | Q1 2025</title>
+    <!-- Modern styling -->
+    <style>
+        * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
@@ -97,34 +98,72 @@
         margin: 0.5rem 0;
       }
     }
+
+ .grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); /* Smaller min size */
+    gap: 10px;
+    padding: 10px;
+    max-width: 600px; /* Reduce max width */
+    margin: auto;
+    justify-content: center;
+}
+
+.grid-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 80px; /* Adjust smaller height */
+    overflow: hidden;
+}
+
+.grid-item img {
+    width: 80px; /* Force smaller width */
+    height: 80px; /* Force smaller height */
+    object-fit: cover; /* Prevent distortion */
+    border-radius: 5px;
+}
+
+
+
   </style>
+
 </head>
+
 <body>
-  <div class="container">
-    <h1>We Are Launching Soon 🚀</h1>
-    <p>East Coast Hobby Ventures is set begin operating <strong>Q1 2025!</strong> </p>
-    <p>Drop your email below to stay up to date on everything we have in store.</p>
-
-    <!-- Email form -->
-    <form action="/submit-email" method="POST">
-      <input type="hidden" name="source" value="landing">
-      <input type="email" name="email" placeholder="Your Email Address" required>
-      <button type="submit">Notify Me</button>
-    </form>
-
-    <!-- Success and Error messages -->
-    <% if (success) { %>
-      <p class="success">Thank you so much for subscribing! 🎉</p>
-    <% } %>
-    <% if (error) { %>
-      <p class="error" style="color: red;"><%= error %></p>
-    <% } %>
-  </div>
-
-  <div class="footer">
-    &copy; <%= new Date().getFullYear() %> East Coast Hobby Ventures LLC. All rights reserved.
-  </div>
+    <div class="container">
+        <h1>We Are Launching Soon 🚀</h1>
+        <p>East Coast Hobby Ventures is set begin operating <strong>Q1 2025!</strong> </p>
+        <p>Drop your email below to stay up to date on everything we have in store.</p>
+        <!-- Email form -->
+        <form action="/submit-email" method="POST">
+            <input type="hidden" name="source" value="landing">
+            <input type="email" name="email" placeholder="Your Email Address" required>
+            <button type="submit">Notify Me</button>
+        </form>
+        <!-- Success and Error messages -->
+        <% if (success) { %>
+        <p class="success">Thank you so much for subscribing! 🎉</p>
+        <% } %>
+        <% if (error) { %>
+        <p class="error" style="color: red;">
+            <%= error %>
+        </p>
+        <% } %>
+        <h3 id="outsideLinks">In the meantime follow our photography pages ECHV Photo here.</h3>
+        <div class="wrapper">
+       <div class="grid-container">
+         <a href="https://www.facebook.com/ECHVPhoto/" class="grid-item">
+                <img src="/uploads/Facebook_Logo_Primary.png" alt="FacebookLogo">
+            </a>
+            <a href="https://www.instagram.com/echvPhoto/" class="grid-item">
+                <img src="/uploads/Instagram_Glyph_Gradient.png" alt="InstagramLogo">
+            </a>
+       </div>
+       </div>
+            &copy;
+            <%= new Date().getFullYear() %> East Coast Hobby Ventures LLC. All rights reserved.
+        </div>
 </body>
+
 </html>
-
-
